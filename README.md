@@ -41,7 +41,7 @@ $ yarn run start
 # watch mode
 $ yarn run start:dev
 
-# production mode
+# prod mode
 $ yarn run start:prod
 ```
 
