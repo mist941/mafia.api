@@ -4,6 +4,8 @@ import { SigninRequestDTO } from './dto/signin-request.dto';
 
 @Injectable()
 export class AuthService {
+  constructor() {
+  }
   signup(signupInput: SignupRequestDTO) {
     return 'This action adds a new auth';
   }
