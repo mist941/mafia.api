@@ -3,6 +3,7 @@ import { UsersModule } from './users/users.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import {join} from 'path';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import {join} from 'path';
       plugins: [],
     }),
     UsersModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

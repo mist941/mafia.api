@@ -12,5 +12,5 @@ export class User {
   password: string;
 
   @Field()
-  nickname: string;
+  username: string;
 }
