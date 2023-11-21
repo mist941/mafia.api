@@ -6,23 +6,24 @@ type Auth {
   id: Int!
 }
 
-input CreateAuthDto {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 input CreateUserDto {
   """Example field (placeholder)"""
   exampleField: Int!
 }
 
 type Mutation {
-  createAuth(createAuthInput: CreateAuthDto!): Auth!
   createUser(createUserInput: CreateUserDto!): User!
+  signUp(signUpInput: SignupRequestDTO!): Auth!
 }
 
 type Query {
   users: [User!]!
+}
+
+input SignupRequestDTO {
+  email: String!
+  password: String!
+  username: String!
 }
 
 type User {

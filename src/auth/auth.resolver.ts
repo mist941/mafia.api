@@ -1,7 +1,7 @@
 import { Resolver, Mutation, Args } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
 import { Auth } from './entities/auth.entity';
+import { SignupRequestDTO } from './dto/signup-request.dto';
 
 @Resolver(() => Auth)
 export class AuthResolver {
@@ -9,7 +9,7 @@ export class AuthResolver {
   }
 
   @Mutation(() => Auth)
-  createAuth(@Args('createAuthInput') createAuthInput: CreateAuthDto) {
-    return this.authService.create(createAuthInput);
+  signUp(@Args('signUpInput') signUpInput: SignupRequestDTO) {
+    return this.authService.signUp(signUpInput);
   }
 }
