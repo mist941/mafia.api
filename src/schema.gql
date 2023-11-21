@@ -2,19 +2,13 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-input CreateUserDto {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 type Mutation {
-  createUser(createUserInput: CreateUserDto!): User!
   signin(signupInput: SigninRequestDTO!): SignResponseDTO!
   signup(signupInput: SignupRequestDTO!): SignResponseDTO!
 }
 
 type Query {
-  users: [User!]!
+  query: String!
 }
 
 type SignResponseDTO {
