@@ -9,7 +9,7 @@ export class User {
   email: string;
 
   @Field()
-  password: string;
+  hashedPassword: string;
 
   @Field()
   username: string;

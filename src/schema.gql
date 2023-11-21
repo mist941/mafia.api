@@ -2,10 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Auth {
-  id: Int!
-}
-
 input CreateUserDto {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -13,11 +9,23 @@ input CreateUserDto {
 
 type Mutation {
   createUser(createUserInput: CreateUserDto!): User!
-  signUp(signUpInput: SignupRequestDTO!): Auth!
+  signin(signupInput: SigninRequestDTO!): SignResponseDTO!
+  signup(signupInput: SignupRequestDTO!): SignResponseDTO!
 }
 
 type Query {
   users: [User!]!
+}
+
+type SignResponseDTO {
+  accessToken: String!
+  refreshToken: String!
+  user: User!
+}
+
+input SigninRequestDTO {
+  email: String!
+  password: String!
 }
 
 input SignupRequestDTO {
@@ -28,7 +36,7 @@ input SignupRequestDTO {
 
 type User {
   email: String!
+  hashedPassword: String!
   id: Int!
-  password: String!
   username: String!
 }
