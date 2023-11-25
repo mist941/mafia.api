@@ -6,6 +6,7 @@ import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { AppResolver } from './app.resolver';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [AppResolver],
 })
 export class AppModule {
 }
