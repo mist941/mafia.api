@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { CreateTokenDTO } from './dto/create-token.dto';
+import { TokensResponseDTO } from './dto/tokens-response.dto';
 
 @Injectable()
 export class TokenService {
@@ -11,15 +12,15 @@ export class TokenService {
   ) {
   }
 
-  generateTokens(params: CreateTokenDTO) {
+  generateTokens(createTokenInput: CreateTokenDTO): TokensResponseDTO {
     try {
-      const accessToken = this.jwtService.sign(params, {
+      const accessToken = this.jwtService.sign(createTokenInput, {
         secret: this.configService.get('JWT_ACCESS_SECRET'),
-        expiresIn: '15000s',
+        expiresIn: '10h',
       });
-      const refreshToken = this.jwtService.sign(params, {
+      const refreshToken = this.jwtService.sign(createTokenInput, {
         secret: this.configService.get('JWT_REFRESH_SECRET'),
-        expiresIn: '30000s',
+        expiresIn: '5d',
       });
       return {
         accessToken,
