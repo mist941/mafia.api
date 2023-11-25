@@ -2,6 +2,11 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Mutation {
   signin(signupInput: SigninRequestDTO!): SignResponseDTO!
   signup(signupInput: SignupRequestDTO!): SignResponseDTO!
@@ -29,8 +34,10 @@ input SignupRequestDTO {
 }
 
 type User {
+  createdAt: DateTime!
   email: String!
   hashedPassword: String!
+  hashedRefreshToken: String
   id: Int!
   username: String!
 }

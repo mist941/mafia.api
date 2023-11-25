@@ -28,6 +28,8 @@ export class AuthService {
       password: signupInput.password,
     });
 
+    await this.userService.updateRefreshToken(newUser.id, tokens.refreshToken);
+
     return { ...tokens, user: newUser };
   }
 

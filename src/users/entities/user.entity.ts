@@ -11,6 +11,12 @@ export class User {
   @Field()
   hashedPassword: string;
 
+  @Field({ nullable: true })
+  hashedRefreshToken?: string;
+
+  @Field()
+  createdAt?: Date;
+
   @Field()
   username: string;
 }

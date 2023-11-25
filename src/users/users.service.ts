@@ -16,9 +16,21 @@ export class UsersService {
       return await this.prisma.user.create({
         data: {
           email: createUserInput.email,
-          username: createUserInput.password,
+          username: createUserInput.username,
           hashedPassword,
         },
+      });
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  async updateRefreshToken(userId: number, refreshToken: string): Promise<void> {
+    try {
+      const hashedRefreshToken = await argon.hash(refreshToken);
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { hashedRefreshToken },
       });
     } catch (e) {
       throw new InternalServerErrorException(e);
