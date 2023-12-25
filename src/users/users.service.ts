@@ -1,8 +1,9 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from './entities/user.entity';
 import * as argon from 'argon2';
+import { SigninRequestDTO } from '../auth/dto/signin-request.dto';
 
 @Injectable()
 export class UsersService {
@@ -45,5 +46,19 @@ export class UsersService {
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
+  }
+
+  async validateUser(signinInput: SigninRequestDTO): Promise<User> {
+    const user = await this.findUserByEmail(signinInput.email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isPasswordValid = await argon.verify(user.hashedPassword, signinInput.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid password');
+    }
+
+    return user;
   }
 }

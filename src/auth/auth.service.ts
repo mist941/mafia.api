@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignupRequestDTO } from './dto/signup-request.dto';
 import { SigninRequestDTO } from './dto/signin-request.dto';
 import { UsersService } from '../users/users.service';
@@ -33,7 +33,20 @@ export class AuthService {
     return { ...tokens, user: newUser };
   }
 
-  signin(signinInput: SigninRequestDTO) {
-    return 'This action adds a new auth';
+  async signin(signinInput: SigninRequestDTO): Promise<SignResponseDTO> {
+
+    const user = await this.userService.validateUser(signinInput);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const tokens = this.tokenService.generateTokens({
+      email: signinInput.email,
+      password: signinInput.password,
+    });
+
+    await this.userService.updateRefreshToken(user.id, tokens.refreshToken);
+
+    return { ...tokens, user };
   }
 }
