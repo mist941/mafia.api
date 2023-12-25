@@ -15,7 +15,7 @@ export class AuthResolver {
   }
 
   @Mutation(() => SignResponseDTO)
-  signin(@Args('signupInput') signinInput: SigninRequestDTO) {
+  signin(@Args('signinInput') signinInput: SigninRequestDTO) {
     return this.authService.signin(signinInput);
   }
 }
