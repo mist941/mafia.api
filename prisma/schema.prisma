@@ -13,7 +13,7 @@ model Game {
   createdAt       DateTime @default(now())
   numberOfPlayers Int
   currentPeriod   String
-  playerId        Int
+  currentPlayerId Int
   currentPlayer   Player?
   action          Action[]
 }
