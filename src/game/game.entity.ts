@@ -20,5 +20,5 @@ export class Game {
   currentPeriod: GamePeriods;
 
   @Field(() => PLayer)
-  currentPlayer: PLayer;
+  currentPlayerId: PLayer;
 }

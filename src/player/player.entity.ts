@@ -18,5 +18,5 @@ export class PLayer {
   role: PlayerRoles;
 
   @Field(() => Game)
-  game: Game;
+  gameId: Game;
 }

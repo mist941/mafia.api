@@ -12,13 +12,13 @@ export class Action {
   createdAt: Date;
 
   @Field(() => Game)
-  game: Game;
+  gameId: Game;
 
   @Field(() => PLayer)
-  targetPlayer: PLayer;
+  targetPlayerId: PLayer;
 
   @Field(() => PLayer)
-  sourcePlayer: PLayer;
+  sourcePlayerId: PLayer;
 
   @Field(() => String)
   period: GamePeriods;
