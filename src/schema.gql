@@ -2,14 +2,40 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input CreateGameRequestDTO {
+  gameName: String!
+  numberOfPlayers: Float!
+  private: Boolean!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
 
+type Game {
+  createdAt: DateTime!
+  currentPeriod: String!
+  currentPlayerId: PLayer
+  id: Int!
+  name: String!
+  numberOfPlayers: Int!
+  ownerId: User!
+  private: Boolean!
+}
+
 type Mutation {
+  createGame(createGameInput: CreateGameRequestDTO!): Game!
   signin(signinInput: SigninRequestDTO!): SignResponseDTO!
   signup(signupInput: SignupRequestDTO!): SignResponseDTO!
+}
+
+type PLayer {
+  gameId: Game!
+  id: Int!
+  role: String!
+  status: String!
+  user: User!
 }
 
 type Query {

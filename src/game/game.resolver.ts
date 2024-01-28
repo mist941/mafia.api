@@ -18,6 +18,6 @@ export class GameResolver {
     @Args('createGameInput') createGameInput: CreateGameRequestDTO,
     @Context() context: { req: Request },
   ) {
-    return this.gameService.createGame(createGameInput);
+    return this.gameService.createGame(createGameInput, null);
   }
 }
