@@ -7,11 +7,48 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Game {
+  id              Int      @id @default(autoincrement())
+  name            String
+  createdAt       DateTime @default(now())
+  numberOfPlayers Int
+  currentPeriod   String
+  playerId        Int
+  currentPlayer   Player?
+  action          Action[]
+}
+
+model Action {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  period         String
+  step           Int
+  gameId         Int
+  game           Game     @relation(fields: [gameId], references: [id])
+  targetPlayerId Int
+  targetPlayer   Player   @relation(fields: [targetPlayerId], references: [id], name: "targetPlayer")
+  sourcePlayerId Int
+  sourcePlayer   Player   @relation(fields: [sourcePlayerId], references: [id], name: "sourcePlayer")
+}
+
+model Player {
+  id           Int      @id @default(autoincrement())
+  status       String
+  role         String
+  gameId       Int      @unique
+  game         Game     @relation(fields: [gameId], references: [id])
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  actionTarget Action[] @relation("targetPlayer")
+  actionSource Action[] @relation("sourcePlayer")
+}
+
 model User {
   id                 Int      @id @default(autoincrement())
-  username           String
+  email              String
   hashedPassword     String
   hashedRefreshToken String?
   createdAt          DateTime @default(now())
-  email              String
+  username           String
+  players            Player[]
 }

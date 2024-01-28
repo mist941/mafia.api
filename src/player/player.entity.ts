@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/user.entity';
 import { PlayerRoles, PlayerStatuses } from './player.type';
 import { Game } from '../game/game.entity';
 

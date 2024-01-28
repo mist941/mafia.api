@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from './entities/user.entity';
+import { User } from './user.entity';
 import * as argon from 'argon2';
 import { SigninRequestDTO } from '../auth/dto/signin-request.dto';
 

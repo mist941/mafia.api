@@ -10,8 +10,8 @@ export class Game {
   @Field(() => String)
   name: string;
 
-  @Field(() => Game)
-  game: Game;
+  @Field()
+  createdAt: Date;
 
   @Field(() => Int)
   numberOfPlayers: number;

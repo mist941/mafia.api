@@ -4,7 +4,7 @@ import { SigninRequestDTO } from './dto/signin-request.dto';
 import { UsersService } from '../users/users.service';
 import { SignResponseDTO } from './dto/sign-response.dto';
 import { TokenService } from '../token/token.service';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class AuthService {
