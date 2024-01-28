@@ -1,5 +1,4 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { GamePeriods } from './game.types';
 import { PLayer } from '../player/player.entity';
 import { User } from '../users/user.entity';
 
@@ -12,7 +11,7 @@ export class Game {
   name: string;
 
   @Field(() => User)
-  owner: User;
+  ownerId: number;
 
   @Field()
   createdAt?: Date;
@@ -21,10 +20,10 @@ export class Game {
   numberOfPlayers: number;
 
   @Field(() => String)
-  currentPeriod: GamePeriods;
+  currentPeriod: string;
 
   @Field(() => PLayer, { nullable: true })
-  currentPlayerId?: PLayer;
+  currentPlayerId?: number;
 
   @Field(() => Boolean)
   private: Boolean;

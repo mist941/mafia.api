@@ -3,6 +3,7 @@ import { CreateGameRequestDTO } from './dto/create-game-request.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { GamePeriods } from './game.types';
 import { User } from '../users/user.entity';
+import { Game } from './game.entity';
 
 @Injectable()
 export class GameService {
@@ -10,7 +11,7 @@ export class GameService {
 
   }
 
-  async createGame(createGameInput: CreateGameRequestDTO, user: User) {
+  async createGame(createGameInput: CreateGameRequestDTO, user: User):Promise<Game> {
     try {
       return await this.prisma.game.create({
         data: {
