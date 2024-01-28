@@ -1,15 +1,12 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { TokenService } from '../token/token.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private tokenService: TokenService,
+    private userService: UsersService
   ) {
   }
 
@@ -24,8 +21,7 @@ export class AuthGuard implements CanActivate {
 
     try {
       const payload = await this.tokenService.validateAccessToken(token);
-
-      request['user'] = payload;
+      request['user'] = await this.userService.findUserByEmail(payload.email);
     } catch (err) {
       throw new UnauthorizedException();
     }
@@ -33,8 +29,13 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    console.log(request);
-    return '';
+  private extractTokenFromHeader(request: Request): string {
+    const bearerToken = request.headers['authorization'];
+    const parts = bearerToken?.split(' ');
+    if (parts?.length === 2 && parts[0] === 'Bearer') {
+      return parts[1]?.replaceAll('"', "");
+    } else {
+      throw new UnauthorizedException('Invalid Bearer token format');
+    }
   }
 }
