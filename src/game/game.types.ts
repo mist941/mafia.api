@@ -1,4 +1,6 @@
 export enum GamePeriods {
+  START = 'start',
   DAY = 'day',
-  NIGHT = 'night'
+  NIGHT = 'night',
+  END = 'end'
 }

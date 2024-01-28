@@ -13,9 +13,12 @@ model Game {
   createdAt       DateTime @default(now())
   numberOfPlayers Int
   currentPeriod   String
+  private         Boolean
   currentPlayerId Int
   currentPlayer   Player?
   action          Action[]
+  ownerId         Int
+  owner           User     @relation(fields: [ownerId], references: [id])
 }
 
 model Action {
@@ -51,4 +54,5 @@ model User {
   createdAt          DateTime @default(now())
   username           String
   players            Player[]
+  game               Game[]
 }
