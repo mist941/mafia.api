@@ -14,7 +14,7 @@ model Game {
   numberOfPlayers Int
   currentPeriod   String
   private         Boolean
-  currentPlayerId Int
+  currentPlayerId Int?
   currentPlayer   Player?
   action          Action[]
   ownerId         Int

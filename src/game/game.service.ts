@@ -11,7 +11,7 @@ export class GameService {
 
   }
 
-  async createGame(createGameInput: CreateGameRequestDTO, user: User):Promise<Game> {
+  async createGame(createGameInput: CreateGameRequestDTO, user: User): Promise<Game> {
     try {
       return await this.prisma.game.create({
         data: {
@@ -20,7 +20,6 @@ export class GameService {
           private: createGameInput.private,
           currentPeriod: GamePeriods.START,
           ownerId: user.id,
-          currentPlayerId: null,
         },
       });
     } catch (e) {
