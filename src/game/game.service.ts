@@ -5,7 +5,6 @@ import { GamePeriods } from './game.types';
 import { User } from '../users/user.entity';
 import { GameResponseDTO } from './dto/geme-response.dto';
 import { PlayerRoles } from '../player/player.type';
-import { UsersService } from '../users/users.service';
 import { PlayerService } from '../player/player.service';
 
 @Injectable()
@@ -42,7 +41,7 @@ export class GameService {
 
       const firstPlayer = await this.playerService.createPlayer(
         game.id,
-        user.id, 
+        user.id,
         this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers]
       );
 
