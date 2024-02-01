@@ -8,6 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { AppResolver } from './app.resolver';
 import { GameModule } from './game/game.module';
+import { PlayerModule } from './player/player.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { GameModule } from './game/game.module';
     PrismaModule,
     UsersModule,
     AuthModule,
-    GameModule
+    GameModule,
+    PlayerModule
   ],
   controllers: [],
   providers: [AppResolver],

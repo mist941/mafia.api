@@ -14,9 +14,9 @@ model Game {
   numberOfPlayers Int
   currentPeriod   String
   private         Boolean
-  currentPlayerId Int?
-  currentPlayer   Player?
+  currentRole     String?
   action          Action[]
+  payer           Player[]
   ownerId         Int
   owner           User     @relation(fields: [ownerId], references: [id])
 }

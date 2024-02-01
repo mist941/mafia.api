@@ -16,7 +16,7 @@ scalar DateTime
 type Game {
   createdAt: DateTime!
   currentPeriod: String!
-  currentPlayerId: PLayer
+  currentRole: String!
   id: Int!
   name: String!
   numberOfPlayers: Int!
@@ -28,14 +28,6 @@ type Mutation {
   createGame(createGameInput: CreateGameRequestDTO!): Game!
   signin(signinInput: SigninRequestDTO!): SignResponseDTO!
   signup(signupInput: SignupRequestDTO!): SignResponseDTO!
-}
-
-type PLayer {
-  gameId: Game!
-  id: Int!
-  role: String!
-  status: String!
-  user: User!
 }
 
 type Query {
