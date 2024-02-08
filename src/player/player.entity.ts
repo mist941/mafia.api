@@ -1,6 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { User } from '../users/user.entity';
-import { PlayerRoles, PlayerStatuses } from './player.type';
 import { Game } from '../game/game.entity';
 
 @ObjectType()
@@ -11,10 +10,10 @@ export class PLayer {
   @Field(() => User)
   userId: number;
 
-  @Field(() => PlayerStatuses)
+  @Field(() => String)
   status: string;
 
-  @Field(() => PlayerStatuses)
+  @Field(() => String)
   role: string;
 
   @Field(() => Game)

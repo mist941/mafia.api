@@ -10,12 +10,12 @@ export class AuthResolver {
   }
 
   @Mutation(() => SignResponseDTO)
-  signup(@Args('signupInput') signupInput: SignupRequestDTO) {
+  signup(@Args('signupInput') signupInput: SignupRequestDTO): Promise<SignResponseDTO> {
     return this.authService.signup(signupInput);
   }
 
   @Mutation(() => SignResponseDTO)
-  signin(@Args('signinInput') signinInput: SigninRequestDTO) {
+  signin(@Args('signinInput') signinInput: SigninRequestDTO): Promise<SignResponseDTO> {
     return this.authService.signin(signinInput);
   }
 }

@@ -24,10 +24,24 @@ type Game {
   private: Boolean!
 }
 
+type GameResponseDTO {
+  game: Game!
+  owner: User!
+  players: PLayer!
+}
+
 type Mutation {
-  createGame(createGameInput: CreateGameRequestDTO!): Game!
+  createGame(createGameInput: CreateGameRequestDTO!): GameResponseDTO!
   signin(signinInput: SigninRequestDTO!): SignResponseDTO!
   signup(signupInput: SignupRequestDTO!): SignResponseDTO!
+}
+
+type PLayer {
+  gameId: Game!
+  id: Int!
+  role: String!
+  status: String!
+  userId: User!
 }
 
 type Query {
