@@ -9,14 +9,14 @@ export class PLayer {
   id: number;
 
   @Field(() => User)
-  user: User;
+  userId: number;
 
-  @Field(() => String)
-  status: PlayerStatuses;
+  @Field(() => PlayerStatuses)
+  status: string;
 
-  @Field(() => String)
-  role: PlayerRoles;
+  @Field(() => PlayerStatuses)
+  role: string;
 
   @Field(() => Game)
-  gameId: Game;
+  gameId: number;
 }

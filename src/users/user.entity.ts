@@ -1,4 +1,5 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { Exclude } from 'class-transformer';
 
 @ObjectType()
 export class User {
@@ -9,9 +10,11 @@ export class User {
   email: string;
 
   @Field()
+  @Exclude()
   hashedPassword: string;
 
   @Field({ nullable: true })
+  @Exclude()
   hashedRefreshToken?: string;
 
   @Field()

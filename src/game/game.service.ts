@@ -6,6 +6,8 @@ import { User } from '../users/user.entity';
 import { GameResponseDTO } from './dto/geme-response.dto';
 import { PlayerRoles } from '../player/player.type';
 import { PlayerService } from '../player/player.service';
+import { PLayer } from '../player/player.entity';
+import { Game } from './game.entity';
 
 @Injectable()
 export class GameService {
@@ -29,7 +31,7 @@ export class GameService {
 
   async createGame(createGameInput: CreateGameRequestDTO, user: User): Promise<GameResponseDTO> {
     try {
-      const game = await this.prisma.game.create({
+      const game: Game = await this.prisma.game.create({
         data: {
           name: createGameInput.gameName,
           numberOfPlayers: createGameInput.numberOfPlayers,
@@ -39,13 +41,13 @@ export class GameService {
         },
       });
 
-      const firstPlayer = await this.playerService.createPlayer(
+      const firstPlayer: PLayer = await this.playerService.createPlayer(
         game.id,
         user.id,
-        this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers]
+        this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers],
       );
 
-      return game;
+      return { game, owner: user, players: [firstPlayer] };
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

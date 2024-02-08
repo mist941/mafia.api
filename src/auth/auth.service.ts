@@ -5,6 +5,7 @@ import { UsersService } from '../users/users.service';
 import { SignResponseDTO } from './dto/sign-response.dto';
 import { TokenService } from '../token/token.service';
 import { User } from '../users/user.entity';
+import { TokensResponseDTO } from '../token/dto/tokens-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +24,7 @@ export class AuthService {
     }
 
     const newUser: User = await this.userService.create(signupInput);
-    const tokens = this.tokenService.generateTokens({
+    const tokens: TokensResponseDTO = this.tokenService.generateTokens({
       email: signupInput.email,
       password: signupInput.password,
     });
@@ -34,12 +35,12 @@ export class AuthService {
   }
 
   async signin(signinInput: SigninRequestDTO): Promise<SignResponseDTO> {
-    const user = await this.userService.validateUser(signinInput);
+    const user: User = await this.userService.validateUser(signinInput);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const tokens = this.tokenService.generateTokens({
+    const tokens: TokensResponseDTO = this.tokenService.generateTokens({
       email: signinInput.email,
       password: signinInput.password,
     });

@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Id } from '../common.types';
 import { PlayerRoles, PlayerStatuses } from './player.type';
+import { PLayer } from './player.entity';
 
 @Injectable()
 export class PlayerService {
@@ -11,11 +12,11 @@ export class PlayerService {
 
   }
 
-  async createPlayer(gameId: Id, userId: Id, allowedRoles: PlayerRoles[]) {
+  async createPlayer(gameId: Id, userId: Id, allowedRoles: PlayerRoles[]): Promise<PLayer> {
     try {
       const randomRoleIndex = Math.floor(Math.random() * (allowedRoles.length + 1));
 
-      return await this.prisma.player.create({
+      return this.prisma.player.create({
         data: {
           userId,
           gameId,
