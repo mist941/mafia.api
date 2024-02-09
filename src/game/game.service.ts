@@ -47,7 +47,7 @@ export class GameService {
         this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers],
       );
 
-      return { game, owner: user, players: [firstPlayer] };
+      return { game, players: [firstPlayer], player: firstPlayer };
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

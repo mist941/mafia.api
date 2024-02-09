@@ -16,18 +16,18 @@ scalar DateTime
 type Game {
   createdAt: DateTime!
   currentPeriod: String!
-  currentRole: String!
+  currentRole: String
   id: Int!
   name: String!
-  numberOfPlayers: Int!
-  ownerId: User!
+  numberOfPlayers: ID!
+  ownerId: Float!
   private: Boolean!
 }
 
 type GameResponseDTO {
   game: Game!
-  owner: User!
-  players: PLayer!
+  player: PLayer!
+  players: [PLayer!]!
 }
 
 type Mutation {
@@ -37,11 +37,11 @@ type Mutation {
 }
 
 type PLayer {
-  gameId: Game!
+  gameId: ID!
   id: Int!
   role: String!
   status: String!
-  userId: User!
+  userId: ID!
 }
 
 type Query {

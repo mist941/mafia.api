@@ -1,5 +1,4 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { User } from '../users/user.entity';
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class Game {
@@ -9,19 +8,19 @@ export class Game {
   @Field(() => String)
   name: string;
 
-  @Field(() => User)
+  @Field(() => Number)
   ownerId: number;
 
-  @Field()
+  @Field(() => Date)
   createdAt?: Date;
 
-  @Field(() => Int)
+  @Field(() => ID)
   numberOfPlayers: number;
 
   @Field(() => String)
   currentPeriod: string;
 
-  @Field(() => String)
+  @Field({ nullable: true, defaultValue: null })
   currentRole?: string;
 
   @Field(() => Boolean)
