@@ -8,6 +8,7 @@ import { PlayerRoles } from '../player/player.type';
 import { PlayerService } from '../player/player.service';
 import { PLayer } from '../player/player.entity';
 import { Game } from './game.entity';
+import { PlayerResponseDto } from '../player/dto/player-response.dto';
 
 @Injectable()
 export class GameService {
@@ -41,7 +42,7 @@ export class GameService {
         },
       });
 
-      const firstPlayer: PLayer = await this.playerService.createPlayer(
+      const firstPlayer: PlayerResponseDto = await this.playerService.createPlayer(
         game.id,
         user.id,
         this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers],

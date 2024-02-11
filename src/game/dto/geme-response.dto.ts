@@ -1,15 +1,16 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { PLayer } from '../../player/player.entity';
 import { Game } from '../game.entity';
+import { PlayerResponseDto } from '../../player/dto/player-response.dto';
 
 @ObjectType()
 export class GameResponseDTO {
   @Field(() => Game)
   game: Game;
 
-  @Field(() => [PLayer])
-  players: PLayer[];
+  @Field(() => [PlayerResponseDto])
+  players: PlayerResponseDto[];
 
-  @Field(() => PLayer)
-  player: PLayer;
+  @Field(() => PlayerResponseDto)
+  player: PlayerResponseDto;
 }

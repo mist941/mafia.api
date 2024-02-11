@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Id } from '../common.types';
 import { PlayerRoles, PlayerStatuses } from './player.type';
 import { PLayer } from './player.entity';
+import { PlayerResponseDto } from './dto/player-response.dto';
 
 @Injectable()
 export class PlayerService {
@@ -12,11 +13,11 @@ export class PlayerService {
 
   }
 
-  async createPlayer(gameId: Id, userId: Id, allowedRoles: PlayerRoles[]): Promise<PLayer> {
+  async createPlayer(gameId: Id, userId: Id, allowedRoles: PlayerRoles[]): Promise<PlayerResponseDto> {
     try {
       const randomRoleIndex = Math.floor(Math.random() * (allowedRoles.length + 1));
 
-      return this.prisma.player.create({
+      const player = await this.prisma.player.create({
         data: {
           userId,
           gameId,
@@ -24,6 +25,18 @@ export class PlayerService {
           role: allowedRoles[randomRoleIndex],
         },
       });
+
+      const user = await this.prisma.user.findFirst({
+        where: { id: player.userId },
+      });
+
+      return {
+        id: player.id,
+        role: player.role,
+        status: player.status,
+        userId: player.userId,
+        username: user.username,
+      };
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

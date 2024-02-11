@@ -26,8 +26,8 @@ type Game {
 
 type GameResponseDTO {
   game: Game!
-  player: PLayer!
-  players: [PLayer!]!
+  player: PlayerResponseDto!
+  players: [PlayerResponseDto!]!
 }
 
 type Mutation {
@@ -36,12 +36,12 @@ type Mutation {
   signup(signupInput: SignupRequestDTO!): SignResponseDTO!
 }
 
-type PLayer {
-  gameId: ID!
-  id: Int!
+type PlayerResponseDto {
+  id: Float!
   role: String!
   status: String!
-  userId: ID!
+  userId: Float!
+  username: String!
 }
 
 type Query {
