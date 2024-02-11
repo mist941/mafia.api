@@ -2,7 +2,6 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Id } from '../common.types';
 import { PlayerRoles, PlayerStatuses } from './player.type';
-import { PLayer } from './player.entity';
 import { PlayerResponseDto } from './dto/player-response.dto';
 
 @Injectable()
