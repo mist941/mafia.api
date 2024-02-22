@@ -62,10 +62,16 @@ export class UserService {
     return user;
   }
 
-  async searchUsers(username: string): Promise<User[]> {
+  async searchUsers(query: string): Promise<User[]> {
     try {
       return await this.prisma.user.findMany({
-        where: { username },
+        where: {
+          username: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+        take: 20,
       });
     } catch (e) {
       throw new InternalServerErrorException(e);
