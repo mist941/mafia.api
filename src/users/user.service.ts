@@ -6,7 +6,7 @@ import * as argon from 'argon2';
 import { SigninRequestDTO } from '../auth/dto/signin-request.dto';
 
 @Injectable()
-export class UsersService {
+export class UserService {
   constructor(private prisma: PrismaService) {
   }
 

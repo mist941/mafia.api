@@ -4,11 +4,10 @@ import { PrismaService } from '../prisma/prisma.service';
 import { GamePeriods } from './game.types';
 import { User } from '../users/user.entity';
 import { GameResponseDTO } from './dto/geme-response.dto';
-import { PlayerRoles } from '../player/player.type';
+import { PlayerRoles } from '../player/player.types';
 import { PlayerService } from '../player/player.service';
-import { PLayer } from '../player/player.entity';
 import { Game } from './game.entity';
-import { PlayerResponseDto } from '../player/dto/player-response.dto';
+import { PlayerResponseDTO } from '../player/dto/player-response.dto';
 
 @Injectable()
 export class GameService {
@@ -42,7 +41,7 @@ export class GameService {
         },
       });
 
-      const firstPlayer: PlayerResponseDto = await this.playerService.createPlayer(
+      const firstPlayer: PlayerResponseDTO = await this.playerService.createPlayer(
         game.id,
         user.id,
         this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers],

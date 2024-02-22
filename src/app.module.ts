@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { UsersModule } from './users/users.module';
+import { UserModule } from './users/user.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
@@ -20,7 +20,7 @@ import { PlayerModule } from './player/player.module';
       plugins: [],
     }),
     PrismaModule,
-    UsersModule,
+    UserModule,
     AuthModule,
     GameModule,
     PlayerModule

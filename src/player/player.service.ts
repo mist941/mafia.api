@@ -1,8 +1,8 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Id } from '../common.types';
-import { PlayerRoles, PlayerStatuses } from './player.type';
-import { PlayerResponseDto } from './dto/player-response.dto';
+import { PlayerRoles, PlayerStatuses } from './player.types';
+import { PlayerResponseDTO } from './dto/player-response.dto';
 
 @Injectable()
 export class PlayerService {
@@ -12,7 +12,7 @@ export class PlayerService {
 
   }
 
-  async createPlayer(gameId: Id, userId: Id, allowedRoles: PlayerRoles[]): Promise<PlayerResponseDto> {
+  async createPlayer(gameId: Id, userId: Id, allowedRoles: PlayerRoles[]): Promise<PlayerResponseDTO> {
     try {
       const randomRoleIndex = Math.floor(Math.random() * (allowedRoles.length + 1));
 

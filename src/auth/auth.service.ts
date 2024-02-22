@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignupRequestDTO } from './dto/signup-request.dto';
 import { SigninRequestDTO } from './dto/signin-request.dto';
-import { UsersService } from '../users/users.service';
+import { UserService } from '../users/user.service';
 import { SignResponseDTO } from './dto/sign-response.dto';
 import { TokenService } from '../token/token.service';
 import { User } from '../users/user.entity';
@@ -10,7 +10,7 @@ import { TokensResponseDTO } from '../token/dto/tokens-response.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UsersService,
+    private userService: UserService,
     private tokenService: TokenService,
   ) {
 
