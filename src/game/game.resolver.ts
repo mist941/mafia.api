@@ -1,6 +1,6 @@
 import { Args, Context, Mutation, Resolver, Subscription } from '@nestjs/graphql';
 import { GameService } from './game.service';
-import { ClassSerializerInterceptor, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ClassSerializerInterceptor, InternalServerErrorException, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { CreateGameRequestDTO } from './dto/create-game-request.dto';
 import { GameResponseDTO } from './dto/geme-response.dto';
@@ -35,16 +35,24 @@ export class GameResolver {
   async invitePlayers(
     @Args('invitePlayersInput') invitePlayersInput: InvitePlayersRequestDTO,
   ): Promise<InvitePlayersResponseDTO> {
-    await this.pubSub.publish(
-      `invitePlayers`,
-      invitePlayersInput,
-    );
-    return invitePlayersInput;
+    try {
+      await this.pubSub.publish(
+        `invitePlayers`,
+        invitePlayersInput,
+      );
+      return invitePlayersInput;
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
   }
 
   @UseGuards(AuthGuard)
   @Subscription(() => InvitePlayersResponseDTO)
   invitePlayersSubscription() {
-    return this.pubSub.asyncIterator(`invitePlayers`);
+    try {
+      return this.pubSub.asyncIterator(`invitePlayers`);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
   }
 }

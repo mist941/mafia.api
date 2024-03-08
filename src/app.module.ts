@@ -18,12 +18,10 @@ const pubSub = new PubSub();
     ConfigModule.forRoot({ isGlobal: true }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      installSubscriptionHandlers: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
       plugins: [],
-      subscriptions: {
-        'graphql-ws': true,
-      },
     }),
     PrismaModule,
     UserModule,
