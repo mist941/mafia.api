@@ -82,7 +82,7 @@ input SignupRequestDTO {
 }
 
 type Subscription {
-  invitePlayersSubscription: InvitePlayersResponseDTO!
+  invitePlayersSubscription(userId: Float!): InvitePlayersResponseDTO!
 }
 
 type User {

@@ -8,6 +8,7 @@ import { User } from '../users/user.entity';
 import { InvitePlayersRequestDTO } from './dto/invite-players-request.dto';
 import { InvitePlayersResponseDTO } from './dto/invite-players-response.dto';
 import { PubSub } from 'graphql-subscriptions';
+import { Id } from '../common.types';
 
 @Resolver()
 export class GameResolver {
@@ -48,7 +49,7 @@ export class GameResolver {
 
   @UseGuards(AuthGuard)
   @Subscription(() => InvitePlayersResponseDTO)
-  invitePlayersSubscription() {
+  invitePlayersSubscription(@Args('userId') userId: Id) {
     try {
       return this.pubSub.asyncIterator(`invitePlayers`);
     } catch (e) {
