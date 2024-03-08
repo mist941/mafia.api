@@ -30,8 +30,19 @@ type GameResponseDTO {
   players: [PlayerResponseDTO!]!
 }
 
+input InvitePlayersRequestDTO {
+  gameId: Float!
+  playerIds: [ID!]!
+}
+
+type InvitePlayersResponseDTO {
+  gameId: Int!
+  playerIds: [Int!]!
+}
+
 type Mutation {
   createGame(createGameInput: CreateGameRequestDTO!): GameResponseDTO!
+  invitePlayers(invitePlayersInput: InvitePlayersRequestDTO!): InvitePlayersResponseDTO!
   signin(signinInput: SigninRequestDTO!): SignResponseDTO!
   signup(signupInput: SignupRequestDTO!): SignResponseDTO!
 }

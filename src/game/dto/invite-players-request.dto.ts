@@ -1,4 +1,4 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, ID, InputType } from '@nestjs/graphql';
 import { IsArray, IsNotEmpty, IsNumber } from 'class-validator';
 import { Id } from '../../common.types';
 
@@ -6,7 +6,7 @@ import { Id } from '../../common.types';
 export class InvitePlayersRequestDTO {
   @IsNotEmpty()
   @IsArray()
-  @Field()
+  @Field(() => [ID])
   playerIds: Id[];
 
   @IsNotEmpty()
