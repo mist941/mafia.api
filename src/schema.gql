@@ -39,6 +39,7 @@ input InvitePlayersRequestDTO {
 type InvitePlayersResponseDTO {
   gameId: Int!
   gameName: String!
+  userIds: [ID!]!
 }
 
 type Mutation {
