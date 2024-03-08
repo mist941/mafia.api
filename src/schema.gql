@@ -81,6 +81,10 @@ input SignupRequestDTO {
   username: String!
 }
 
+type Subscription {
+  invitePlayersSubscription: InvitePlayersResponseDTO!
+}
+
 type User {
   createdAt: DateTime!
   email: String!

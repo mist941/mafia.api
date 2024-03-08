@@ -41,6 +41,7 @@ export class GameResolver {
     );
     return invitePlayersInput;
   }
+
   @UseGuards(AuthGuard)
   @Subscription(() => InvitePlayersResponseDTO)
   invitePlayersSubscription() {
