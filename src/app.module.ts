@@ -9,6 +9,9 @@ import { ConfigModule } from '@nestjs/config';
 import { AppResolver } from './app.resolver';
 import { GameModule } from './game/game.module';
 import { PlayerModule } from './player/player.module';
+import { PubSub } from 'graphql-subscriptions';
+
+const pubSub = new PubSub();
 
 @Module({
   imports: [
@@ -18,15 +21,21 @@ import { PlayerModule } from './player/player.module';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
       plugins: [],
+      subscriptions: {
+        'graphql-ws': true,
+      },
     }),
     PrismaModule,
     UserModule,
     AuthModule,
     GameModule,
-    PlayerModule
+    PlayerModule,
   ],
   controllers: [],
-  providers: [AppResolver],
+  providers: [
+    { provide: 'PUB_SUB', useValue: pubSub },
+    AppResolver,
+  ],
 })
 export class AppModule {
 }
