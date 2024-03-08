@@ -10,14 +10,14 @@ import { InvitePlayersResponseDTO } from './dto/invite-players-response.dto';
 import { PubSub } from 'graphql-subscriptions';
 import { Id } from '../common.types';
 
+const pubSub = new PubSub();
+
 @Resolver()
 export class GameResolver {
-  public pubSub: PubSub;
-
   constructor(
     private readonly gameService: GameService,
   ) {
-    this.pubSub = new PubSub();
+
   }
 
   @UseGuards(AuthGuard)
@@ -37,8 +37,8 @@ export class GameResolver {
     @Args('invitePlayersInput') invitePlayersInput: InvitePlayersRequestDTO,
   ): Promise<InvitePlayersResponseDTO> {
     try {
-      await this.pubSub.publish(
-        `invitePlayers`,
+      pubSub.publish(
+        'invitePlayers',
         invitePlayersInput,
       );
       return invitePlayersInput;
@@ -47,11 +47,18 @@ export class GameResolver {
     }
   }
 
-  @UseGuards(AuthGuard)
-  @Subscription(() => InvitePlayersResponseDTO)
-  invitePlayersSubscription(@Args('userId') userId: Id) {
+  @Subscription(() => InvitePlayersResponseDTO, {
+    nullable: true,
+    resolve: (value) => value,
+    filter: (payload, variables) => {
+      return payload.userIds.includes(String(variables.userId));
+    },
+  })
+  invitePlayersSubscription(
+    @Args('userId') userId: Id,
+  ) {
     try {
-      return this.pubSub.asyncIterator(`invitePlayers`);
+      return pubSub.asyncIterator('invitePlayers');
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

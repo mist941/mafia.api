@@ -32,12 +32,13 @@ type GameResponseDTO {
 
 input InvitePlayersRequestDTO {
   gameId: Float!
-  playerIds: [ID!]!
+  gameName: String!
+  userIds: [ID!]!
 }
 
 type InvitePlayersResponseDTO {
   gameId: Int!
-  playerIds: [Int!]!
+  gameName: String!
 }
 
 type Mutation {
@@ -82,7 +83,7 @@ input SignupRequestDTO {
 }
 
 type Subscription {
-  invitePlayersSubscription(userId: Float!): InvitePlayersResponseDTO!
+  invitePlayersSubscription(userId: Float!): InvitePlayersResponseDTO
 }
 
 type User {

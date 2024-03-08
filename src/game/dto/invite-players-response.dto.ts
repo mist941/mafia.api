@@ -3,8 +3,8 @@ import { Id } from '../../common.types';
 
 @ObjectType()
 export class InvitePlayersResponseDTO {
-  @Field(() => [Int])
-  playerIds: Id[];
+  @Field(() => String)
+  gameName: string;
 
   @Field(() => Int)
   gameId: Id;
