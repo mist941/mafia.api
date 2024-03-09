@@ -40,7 +40,9 @@ export class GameResolver {
     @Context() context: { req: Request },
   ): Promise<GameResponseDTO> {
     const user = context.req['user'] as User;
-    return this.gameService.addNewPlayer(addNewPlayerInput, user);
+    const game: GameResponseDTO = await this.gameService.addNewPlayer(addNewPlayerInput, user);
+    pubSub.publish('syncGame', game);
+    return game;
   }
 
   @UseGuards(AuthGuard)

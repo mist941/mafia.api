@@ -9,10 +9,7 @@ import { PlayerService } from '../player/player.service';
 import { Game } from './game.entity';
 import { PlayerResponseDTO } from '../player/dto/player-response.dto';
 import { AddNewPlayerRequestDTO } from './dto/add-new-player-request.dto';
-import { PubSub } from 'graphql-subscriptions';
 import { Id } from '../common.types';
-
-const pubSub = new PubSub();
 
 @Injectable()
 export class GameService {
@@ -74,19 +71,12 @@ export class GameService {
 
       const gamePlayers: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(createGameInput.gameId);
 
-      const preparedGameResponse: GameResponseDTO = { game, players: gamePlayers, player: newPlayer };
-
-      this.syncGame(preparedGameResponse);
-
-      return preparedGameResponse;
+      return { game, players: gamePlayers, player: newPlayer };
     } catch (e) {
       throw e;
     }
   }
 
-  syncGame(game: GameResponseDTO): void {
-    pubSub.publish('syncGame', game);
-  }
 
   async findGameById(id: Id): Promise<Game> {
     try {
