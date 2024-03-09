@@ -89,7 +89,6 @@ export class GameService {
     }
   }
 
-
   async findGameById(id: Id): Promise<Game> {
     try {
       return await this.prisma.game.findFirst({
