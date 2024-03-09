@@ -7,6 +7,17 @@ import { PlayerResponseDTO } from './dto/player-response.dto';
 @Injectable()
 export class PlayerService {
   readonly DEFAULT_PLAYER_STATUS: PlayerStatuses = PlayerStatuses.ACTIVE;
+  readonly DEFAULT_PLAYER_DB_SELECTION = {
+    id: true,
+    role: true,
+    status: true,
+    userId: true,
+    user: {
+      select: {
+        username: true,
+      },
+    },
+  }
 
   constructor(private prisma: PrismaService) {
 
@@ -23,10 +34,7 @@ export class PlayerService {
           status: this.DEFAULT_PLAYER_STATUS,
           role: allowedRoles[randomRoleIndex],
         },
-      });
-
-      const user = await this.prisma.user.findFirst({
-        where: { id: player.userId },
+        select: this.DEFAULT_PLAYER_DB_SELECTION,
       });
 
       return {
@@ -34,8 +42,27 @@ export class PlayerService {
         role: player.role,
         status: player.status,
         userId: player.userId,
-        username: user.username,
+        username: player.user.username,
       };
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  async getPlayersByGameId(gameId: Id): Promise<PlayerResponseDTO[]> {
+    try {
+      const players = await this.prisma.player.findMany({
+        where: { id: gameId },
+        select: this.DEFAULT_PLAYER_DB_SELECTION,
+      });
+
+      return players.map(player => ({
+        id: player.id,
+        role: player.role,
+        status: player.status,
+        userId: player.userId,
+        username: player.user.username,
+      }));
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

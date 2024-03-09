@@ -2,6 +2,10 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AddNewPlayerRequestDTO {
+  gameId: Float!
+}
+
 input CreateGameRequestDTO {
   gameName: String!
   numberOfPlayers: Float!
@@ -43,6 +47,7 @@ type InvitePlayersResponseDTO {
 }
 
 type Mutation {
+  addNewPlayer(addNewPlayerInput: AddNewPlayerRequestDTO!): GameResponseDTO!
   createGame(createGameInput: CreateGameRequestDTO!): GameResponseDTO!
   invitePlayers(invitePlayersInput: InvitePlayersRequestDTO!): InvitePlayersResponseDTO!
   signin(signinInput: SigninRequestDTO!): SignResponseDTO!
@@ -85,6 +90,7 @@ input SignupRequestDTO {
 
 type Subscription {
   invitePlayersSubscription(userId: Float!): InvitePlayersResponseDTO
+  syncGame(gameId: Float!): GameResponseDTO
 }
 
 type User {

@@ -36,6 +36,7 @@ export class AuthService {
 
   async signin(signinInput: SigninRequestDTO): Promise<SignResponseDTO> {
     const user: User = await this.userService.validateUser(signinInput);
+
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }

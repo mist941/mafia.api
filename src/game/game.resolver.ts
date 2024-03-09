@@ -9,6 +9,7 @@ import { InvitePlayersRequestDTO } from './dto/invite-players-request.dto';
 import { InvitePlayersResponseDTO } from './dto/invite-players-response.dto';
 import { PubSub } from 'graphql-subscriptions';
 import { Id } from '../common.types';
+import { AddNewPlayerRequestDTO } from './dto/add-new-player-request.dto';
 
 const pubSub = new PubSub();
 
@@ -29,6 +30,17 @@ export class GameResolver {
   ): Promise<GameResponseDTO> {
     const user = context.req['user'] as User;
     return this.gameService.createGame(createGameInput, user);
+  }
+
+  @UseGuards(AuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Mutation(() => GameResponseDTO)
+  async addNewPlayer(
+    @Args('addNewPlayerInput') addNewPlayerInput: AddNewPlayerRequestDTO,
+    @Context() context: { req: Request },
+  ): Promise<GameResponseDTO> {
+    const user = context.req['user'] as User;
+    return this.gameService.addNewPlayer(addNewPlayerInput, user);
   }
 
   @UseGuards(AuthGuard)
@@ -59,6 +71,23 @@ export class GameResolver {
   ) {
     try {
       return pubSub.asyncIterator('invitePlayers');
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  @Subscription(() => GameResponseDTO, {
+    nullable: true,
+    resolve: (value) => value,
+    filter: (payload, variables) => {
+      return payload.game?.id === variables.gameId;
+    },
+  })
+  syncGame(
+    @Args('gameId') gameId: Id,
+  ) {
+    try {
+      return pubSub.asyncIterator('syncGame');
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
