@@ -38,7 +38,7 @@ model Player {
   id           Int      @id @default(autoincrement())
   status       String
   role         String
-  gameId       Int      @unique
+  gameId       Int
   game         Game     @relation(fields: [gameId], references: [id])
   userId       Int
   user         User     @relation(fields: [userId], references: [id])

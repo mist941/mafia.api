@@ -26,7 +26,6 @@ export class PlayerService {
   async createPlayer(gameId: Id, userId: Id, allowedRoles: PlayerRoles[]): Promise<PlayerResponseDTO> {
     try {
       const randomRoleIndex = Math.floor(Math.random() * (allowedRoles.length + 1));
-
       const player = await this.prisma.player.create({
         data: {
           userId,
@@ -52,7 +51,7 @@ export class PlayerService {
   async getPlayersByGameId(gameId: Id): Promise<PlayerResponseDTO[]> {
     try {
       const players = await this.prisma.player.findMany({
-        where: { id: gameId },
+        where: { gameId },
         select: this.DEFAULT_PLAYER_DB_SELECTION,
       });
 
