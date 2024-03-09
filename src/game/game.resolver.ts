@@ -41,7 +41,13 @@ export class GameResolver {
   ): Promise<GameResponseDTO> {
     const user = context.req['user'] as User;
     const game: GameResponseDTO = await this.gameService.addNewPlayer(addNewPlayerInput, user);
-    pubSub.publish('syncGame', game);
+
+    try {
+      pubSub.publish('syncGame', game);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+
     return game;
   }
 
@@ -80,13 +86,18 @@ export class GameResolver {
 
   @Subscription(() => GameResponseDTO, {
     nullable: true,
-    resolve: (value) => value,
+    resolve: (value, { playerId }) => {
+      const game: GameResponseDTO = value;
+      game.player = game.players.find(player => player.id === playerId);
+      return game;
+    },
     filter: (payload, variables) => {
       return payload.game?.id === variables.gameId;
     },
   })
   syncGameSubscription(
     @Args('gameId') gameId: Id,
+    @Args('playerId') playerId: Id,
   ) {
     try {
       return pubSub.asyncIterator('syncGame');
