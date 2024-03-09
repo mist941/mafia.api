@@ -85,7 +85,7 @@ export class GameResolver {
       return payload.game?.id === variables.gameId;
     },
   })
-  syncGame(
+  syncGameSubscription(
     @Args('gameId') gameId: Id,
   ) {
     try {
