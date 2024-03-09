@@ -59,7 +59,7 @@ export class GameService {
   }
 
   async addNewPlayer(createGameInput: AddNewPlayerRequestDTO, user: User): Promise<GameResponseDTO> {
-    const game = await this.findGameById(createGameInput.gameId);
+    const game: Game = await this.findGameById(createGameInput.gameId);
 
     if (!game) {
       throw new NotFoundException('Game not found');
@@ -84,14 +84,14 @@ export class GameService {
     }
   }
 
-  syncGame(game: GameResponseDTO) {
+  syncGame(game: GameResponseDTO): void {
     pubSub.publish('syncGame', game);
   }
 
-  async findGameById(gameId: Id): Promise<Game> {
+  async findGameById(id: Id): Promise<Game> {
     try {
       return await this.prisma.game.findFirst({
-        where: { id: gameId },
+        where: { id },
       });
     } catch (e) {
       throw new InternalServerErrorException(e);
