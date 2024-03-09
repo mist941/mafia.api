@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateGameRequestDTO } from './dto/create-game-request.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { GamePeriods } from './game.types';
@@ -62,16 +62,28 @@ export class GameService {
       throw new NotFoundException('Game not found');
     }
 
+    const gamePlayers: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(createGameInput.gameId);
+
+    if (gamePlayers.length + 1 >= game.numberOfPlayers) {
+      throw new ConflictException('Game is full');
+    }
+
+    if (gamePlayers.some(player => player.userId === user.id)) {
+      throw new ConflictException('User already added to this game');
+    }
+
+    const usedRoles: PlayerRoles[] = gamePlayers.map(player => player.role) as PlayerRoles[];
+    const availableRoles: PlayerRoles[] = this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers]
+      .filter(role => !usedRoles.includes(role));
+
     try {
       const newPlayer: PlayerResponseDTO = await this.playerService.createPlayer(
         createGameInput.gameId,
         user.id,
-        this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers],
+        availableRoles,
       );
 
-      const gamePlayers: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(createGameInput.gameId);
-
-      return { game, players: gamePlayers, player: newPlayer };
+      return { game, players: [...gamePlayers, newPlayer], player: newPlayer };
     } catch (e) {
       throw e;
     }
