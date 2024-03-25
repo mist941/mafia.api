@@ -64,7 +64,7 @@ export class GameService {
 
     const gamePlayers: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(createGameInput.gameId);
 
-    if (gamePlayers.length + 1 >= game.numberOfPlayers) {
+    if (gamePlayers.length >= game.numberOfPlayers) {
       throw new ConflictException('Game is full');
     }
 
@@ -73,8 +73,10 @@ export class GameService {
     }
 
     const usedRoles: PlayerRoles[] = gamePlayers.map(player => player.role) as PlayerRoles[];
-    const availableRoles: PlayerRoles[] = this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers]
-      .filter(role => !usedRoles.includes(role));
+    const availableRoles: PlayerRoles[] = this.getAvailableForCurrentGameRoles(
+      usedRoles,
+      this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers],
+    );
 
     try {
       const newPlayer: PlayerResponseDTO = await this.playerService.createPlayer(
@@ -97,5 +99,21 @@ export class GameService {
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
+  }
+
+  getAvailableForCurrentGameRoles(usedRoles: PlayerRoles[], rolesByNumberOfPlayers: PlayerRoles[]): PlayerRoles[] {
+    let result: PlayerRoles[] = [];
+    let actualUsedRoles: PlayerRoles[] = usedRoles;
+
+    rolesByNumberOfPlayers.forEach(role => {
+      if (actualUsedRoles.includes(role)) {
+        const firstFound = actualUsedRoles.findIndex(usedRole => usedRole === role);
+        actualUsedRoles.splice(firstFound, 1);
+      } else {
+        result.push(role);
+      }
+    });
+
+    return result;
   }
 }
