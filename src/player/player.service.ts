@@ -12,6 +12,7 @@ export class PlayerService {
     role: true,
     status: true,
     userId: true,
+    ready: true,
     user: {
       select: {
         username: true,
@@ -41,6 +42,7 @@ export class PlayerService {
         role: player.role,
         status: player.status,
         userId: player.userId,
+        ready: player.ready,
         username: player.user.username,
       };
     } catch (e) {
@@ -60,6 +62,7 @@ export class PlayerService {
         role: player.role,
         status: player.status,
         userId: player.userId,
+        ready: player.ready,
         username: player.user.username,
       }));
     } catch (e) {
