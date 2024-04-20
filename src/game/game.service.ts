@@ -13,7 +13,6 @@ import { Id } from '../common.types';
 
 @Injectable()
 export class GameService {
-  readonly DEFAULT_GAME_PERIOD: GamePeriods = GamePeriods.START;
   readonly ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
     5: [
       PlayerRoles.PEACEFUL_RESIDENT,
@@ -38,7 +37,7 @@ export class GameService {
           name: createGameInput.gameName,
           numberOfPlayers: createGameInput.numberOfPlayers,
           private: createGameInput.private,
-          currentPeriod: this.DEFAULT_GAME_PERIOD,
+          currentPeriod: GamePeriods.START,
           ownerId: user.id,
         },
       });

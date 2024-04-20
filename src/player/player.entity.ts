@@ -11,6 +11,9 @@ export class PLayer {
   @Field(() => String)
   status: string;
 
+  @Field({ nullable: false, defaultValue: false })
+  ready: boolean;
+
   @Field(() => String)
   role: string;
 

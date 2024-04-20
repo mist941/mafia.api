@@ -11,6 +11,9 @@ export class PlayerResponseDTO {
   @Field(() => String)
   role: string;
 
+  @Field(() => Boolean)
+  ready: boolean;
+
   @Field(() => Number)
   userId: number;
 
