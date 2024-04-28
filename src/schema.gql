@@ -56,6 +56,7 @@ type Mutation {
 
 type PlayerResponseDTO {
   id: Float!
+  ready: Boolean!
   role: String!
   status: String!
   userId: Float!
