@@ -10,6 +10,7 @@ import { Game } from './game.entity';
 import { PlayerResponseDTO } from '../player/dto/player-response.dto';
 import { AddNewPlayerRequestDTO } from './dto/add-new-player-request.dto';
 import { Id } from '../common.types';
+import { ReadyToPlayRequestDTO } from './dto/ready-to-play-request.dto';
 
 @Injectable()
 export class GameService {
@@ -85,6 +86,23 @@ export class GameService {
       );
 
       return { game, players: [...gamePlayers, newPlayer], player: newPlayer };
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async readyToPlay(readyToPlayInput: ReadyToPlayRequestDTO): Promise<GameResponseDTO> {
+    const game: Game = await this.findGameById(readyToPlayInput.gameId);
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    try {
+      const player: PlayerResponseDTO = await this.playerService.readyToPlay(readyToPlayInput.playerId);
+      const players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(readyToPlayInput.gameId);
+
+      return { game, players, player };
     } catch (e) {
       throw e;
     }

@@ -3,6 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Id } from '../common.types';
 import { PlayerRoles, PlayerStatuses } from './player.types';
 import { PlayerResponseDTO } from './dto/player-response.dto';
+import { Player } from './player.entity';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class PlayerService {
@@ -13,12 +15,13 @@ export class PlayerService {
     status: true,
     userId: true,
     ready: true,
+    gameId: true,
     user: {
       select: {
         username: true,
       },
     },
-  }
+  };
 
   constructor(private prisma: PrismaService) {
 
@@ -52,21 +55,39 @@ export class PlayerService {
 
   async getPlayersByGameId(gameId: Id): Promise<PlayerResponseDTO[]> {
     try {
-      const players = await this.prisma.player.findMany({
+      const players: Player[] = await this.prisma.player.findMany({
         where: { gameId },
         select: this.DEFAULT_PLAYER_DB_SELECTION,
       });
 
-      return players.map(player => ({
-        id: player.id,
-        role: player.role,
-        status: player.status,
-        userId: player.userId,
-        ready: player.ready,
-        username: player.user.username,
-      }));
+      return players.map(this.serializePlayer);
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
+  }
+
+  async readyToPlay(playerId: Id): Promise<PlayerResponseDTO> {
+    try {
+      const player: Player = await this.prisma.player.update({
+        where: { id: playerId },
+        data: { ready: true },
+        select: this.DEFAULT_PLAYER_DB_SELECTION,
+      });
+
+      return this.serializePlayer(player);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  serializePlayer(player): PlayerResponseDTO {
+    return {
+      id: player.id,
+      role: player.role,
+      status: player.status,
+      userId: player.userId,
+      ready: player.ready,
+      username: player.user.username,
+    };
   }
 }

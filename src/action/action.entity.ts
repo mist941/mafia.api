@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { PLayer } from '../player/player.entity';
+import { Player } from '../player/player.entity';
 import { GamePeriods } from '../game/game.types';
 import { Game } from '../game/game.entity';
 
@@ -14,11 +14,11 @@ export class Action {
   @Field(() => Game)
   gameId: Game;
 
-  @Field(() => PLayer)
-  targetPlayerId: PLayer;
+  @Field(() => Player)
+  targetPlayerId: Player;
 
-  @Field(() => PLayer)
-  sourcePlayerId: PLayer;
+  @Field(() => Player)
+  sourcePlayerId: Player;
 
   @Field(() => String)
   period: GamePeriods;
