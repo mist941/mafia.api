@@ -4,7 +4,6 @@ import { Id } from '../common.types';
 import { PlayerRoles, PlayerStatuses } from './player.types';
 import { PlayerResponseDTO } from './dto/player-response.dto';
 import { Player } from './player.entity';
-import { User } from '../users/user.entity';
 
 @Injectable()
 export class PlayerService {
