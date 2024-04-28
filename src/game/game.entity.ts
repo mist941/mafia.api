@@ -1,4 +1,4 @@
-import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class Game {
@@ -14,7 +14,7 @@ export class Game {
   @Field(() => Date)
   createdAt?: Date;
 
-  @Field(() => ID)
+  @Field(() => Number)
   numberOfPlayers: number;
 
   @Field(() => String)

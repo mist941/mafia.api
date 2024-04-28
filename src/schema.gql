@@ -23,7 +23,7 @@ type Game {
   currentRole: String
   id: Int!
   name: String!
-  numberOfPlayers: ID!
+  numberOfPlayers: Float!
   ownerId: Float!
   private: Boolean!
 }
