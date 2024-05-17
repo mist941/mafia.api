@@ -50,6 +50,7 @@ type Mutation {
   addNewPlayer(addNewPlayerInput: AddNewPlayerRequestDTO!): GameResponseDTO!
   createGame(createGameInput: CreateGameRequestDTO!): GameResponseDTO!
   invitePlayers(invitePlayersInput: InvitePlayersRequestDTO!): InvitePlayersResponseDTO!
+  readyToPlay(readyToPlayInput: ReadyToPlayRequestDTO!): GameResponseDTO!
   signin(signinInput: SigninRequestDTO!): SignResponseDTO!
   signup(signupInput: SignupRequestDTO!): SignResponseDTO!
 }
@@ -66,6 +67,11 @@ type PlayerResponseDTO {
 type Query {
   query: String!
   searchUsers(searchUsersInput: SearchUsersRequestDTO!): [User!]!
+}
+
+input ReadyToPlayRequestDTO {
+  gameId: Float!
+  playerId: Float!
 }
 
 input SearchUsersRequestDTO {
