@@ -195,6 +195,12 @@ export class GameService {
     return result;
   }
 
+  /**
+   * Return the next role to play in the game.
+   *
+   * @param {Game} game - The current game object.
+   * @return {PlayerRoles | undefined} - The next role to play, or undefined if not found.
+   */
   getNextRoleToPlay(game: Game): PlayerRoles | undefined {
     const rolesByNumberOfPlayers: PlayerRoles[] = ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers];
     let preparedOrderOfPlay: PlayerRoles[] = ORDER_OF_PLAY;
