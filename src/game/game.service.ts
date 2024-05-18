@@ -11,18 +11,10 @@ import { PlayerResponseDTO } from '../player/dto/player-response.dto';
 import { AddNewPlayerRequestDTO } from './dto/add-new-player-request.dto';
 import { Id } from '../common.types';
 import { ReadyToPlayRequestDTO } from './dto/ready-to-play-request.dto';
+import { ROLES_BY_NUMBER_OF_PLAYERS } from './game.constants';
 
 @Injectable()
 export class GameService {
-  readonly ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
-    5: [
-      PlayerRoles.PEACEFUL_RESIDENT,
-      PlayerRoles.PEACEFUL_RESIDENT,
-      PlayerRoles.PEACEFUL_RESIDENT,
-      PlayerRoles.MAFIA,
-      PlayerRoles.DOCTOR,
-    ],
-  };
 
   constructor(
     private prisma: PrismaService,
@@ -31,6 +23,14 @@ export class GameService {
 
   }
 
+  /**
+   * Creates a new game.
+   *
+   * @param {CreateGameRequestDTO} createGameInput - The input data for creating the game.
+   * @param {User} user - The user creating the game.
+   * @returns {Promise<GameResponseDTO>} A promise that resolves to the newly created game response.
+   * @throws {InternalServerErrorException} If an error occurs while creating the game.
+   */
   async createGame(createGameInput: CreateGameRequestDTO, user: User): Promise<GameResponseDTO> {
     try {
       const game: Game = await this.prisma.game.create({
@@ -46,7 +46,7 @@ export class GameService {
       const firstPlayer: PlayerResponseDTO = await this.playerService.createPlayer(
         game.id,
         user.id,
-        this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers],
+        ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers],
       );
 
       return { game, players: [firstPlayer], player: firstPlayer };
@@ -55,6 +55,15 @@ export class GameService {
     }
   }
 
+  /**
+   * Adds a new player to a game.
+   *
+   * @param {AddNewPlayerRequestDTO} createGameInput - The input data for creating a new player.
+   * @param {User} user - The user to be added to the game.
+   * @returns {Promise<GameResponseDTO>} - A promise that resolves to the updated game response.
+   * @throws {NotFoundException} - If the game is not found.
+   * @throws {ConflictException} - If the game is full or the user is already added to the game.
+   */
   async addNewPlayer(createGameInput: AddNewPlayerRequestDTO, user: User): Promise<GameResponseDTO> {
     const game: Game = await this.findGameById(createGameInput.gameId);
 
@@ -76,7 +85,7 @@ export class GameService {
       const usedRoles: PlayerRoles[] = gamePlayers.map(player => player.role) as PlayerRoles[];
       const availableRoles: PlayerRoles[] = this.getAvailableForCurrentGameRoles(
         usedRoles,
-        this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers],
+        ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers],
       );
 
       const newPlayer: PlayerResponseDTO = await this.playerService.createPlayer(
@@ -91,6 +100,13 @@ export class GameService {
     }
   }
 
+  /**
+   * Marks a player as ready to play in a game and returns game information and player status.
+   *
+   * @param {ReadyToPlayRequestDTO} readyToPlayInput - The input data containing the game ID and player ID.
+   * @returns {Promise<GameResponseDTO>} - The game information and player status.
+   * @throws {NotFoundException} - If the game is not found.
+   */
   async readyToPlay(readyToPlayInput: ReadyToPlayRequestDTO): Promise<GameResponseDTO> {
     let game: Game = await this.findGameById(readyToPlayInput.gameId);
 
@@ -112,6 +128,13 @@ export class GameService {
     }
   }
 
+  /**
+   * Finds a game by its ID.
+   *
+   * @param {Id} id - The ID of the game.
+   * @returns {Promise<Game>} A promise that resolves with the found game.
+   * @throws {InternalServerErrorException} If an error occurs while retrieving the game.
+   */
   async findGameById(id: Id): Promise<Game> {
     try {
       return await this.prisma.game.findFirst({
@@ -122,6 +145,15 @@ export class GameService {
     }
   }
 
+  /**
+   * Updates the current period of a game with the specified id.
+   *
+   * @async
+   * @param {Id} id - The id of the game to update.
+   * @param {GamePeriods} period - The new current period for the game.
+   * @return {Promise<Game>} - A promise that resolves with the updated game object.
+   * @throws {InternalServerErrorException} - If there was an error while updating the game period.
+   */
   async updateGamePeriod(id: Id, period: GamePeriods): Promise<Game> {
     try {
       return await this.prisma.game.update({
@@ -133,6 +165,13 @@ export class GameService {
     }
   }
 
+  /**
+   * Returns the available player roles for the current game.
+   *
+   * @param {PlayerRoles[]} usedRoles - The roles currently being used in the game.
+   * @param {PlayerRoles[]} rolesByNumberOfPlayers - The roles available for the current number of players.
+   * @return {PlayerRoles[]} - The available player roles for the current game.
+   */
   getAvailableForCurrentGameRoles(usedRoles: PlayerRoles[], rolesByNumberOfPlayers: PlayerRoles[]): PlayerRoles[] {
     let result: PlayerRoles[] = [];
     let actualUsedRoles: PlayerRoles[] = usedRoles;
