@@ -212,3 +212,15 @@ export const ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
     PlayerRoles.SENSEI
   ],
 };
+
+export const ORDER_OF_PLAY = [
+  PlayerRoles.BEAUTY,
+  PlayerRoles.MAFIA,
+  PlayerRoles.AVENGER,
+  PlayerRoles.DOCTOR,
+  PlayerRoles.GUARDIAN,
+  PlayerRoles.COMMISSAR,
+  PlayerRoles.MAFIA_LAWYER,
+  PlayerRoles.GODFATHER,
+  PlayerRoles.SENSEI,
+]
