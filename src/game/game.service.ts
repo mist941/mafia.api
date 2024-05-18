@@ -72,13 +72,13 @@ export class GameService {
       throw new ConflictException('User already added to this game');
     }
 
-    const usedRoles: PlayerRoles[] = gamePlayers.map(player => player.role) as PlayerRoles[];
-    const availableRoles: PlayerRoles[] = this.getAvailableForCurrentGameRoles(
-      usedRoles,
-      this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers],
-    );
-
     try {
+      const usedRoles: PlayerRoles[] = gamePlayers.map(player => player.role) as PlayerRoles[];
+      const availableRoles: PlayerRoles[] = this.getAvailableForCurrentGameRoles(
+        usedRoles,
+        this.ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers],
+      );
+
       const newPlayer: PlayerResponseDTO = await this.playerService.createPlayer(
         createGameInput.gameId,
         user.id,
@@ -92,7 +92,7 @@ export class GameService {
   }
 
   async readyToPlay(readyToPlayInput: ReadyToPlayRequestDTO): Promise<GameResponseDTO> {
-    const game: Game = await this.findGameById(readyToPlayInput.gameId);
+    let game: Game = await this.findGameById(readyToPlayInput.gameId);
 
     if (!game) {
       throw new NotFoundException('Game not found');
@@ -101,6 +101,10 @@ export class GameService {
     try {
       const player: PlayerResponseDTO = await this.playerService.readyToPlay(readyToPlayInput.playerId);
       const players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(readyToPlayInput.gameId);
+
+      if (players.every(player => player.ready)) {
+        game = await this.updateGamePeriod(game.id, GamePeriods.NIGHT);
+      }
 
       return { game, players, player };
     } catch (e) {
@@ -112,6 +116,17 @@ export class GameService {
     try {
       return await this.prisma.game.findFirst({
         where: { id },
+      });
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  async updateGamePeriod(id: Id, period: GamePeriods): Promise<Game> {
+    try {
+      return await this.prisma.game.update({
+        where: { id },
+        data: { currentPeriod: period },
       });
     } catch (e) {
       throw new InternalServerErrorException(e);
