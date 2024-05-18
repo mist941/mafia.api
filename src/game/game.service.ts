@@ -11,8 +11,11 @@ import { PlayerResponseDTO } from '../player/dto/player-response.dto';
 import { AddNewPlayerRequestDTO } from './dto/add-new-player-request.dto';
 import { Id } from '../common.types';
 import { ReadyToPlayRequestDTO } from './dto/ready-to-play-request.dto';
-import { ROLES_BY_NUMBER_OF_PLAYERS } from './game.constants';
+import { ORDER_OF_PLAY, ROLES_BY_NUMBER_OF_PLAYERS } from './game.constants';
 
+/**
+ * Service class for managing game-related operations.
+ */
 @Injectable()
 export class GameService {
 
@@ -119,7 +122,7 @@ export class GameService {
       const players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(readyToPlayInput.gameId);
 
       if (players.every(player => player.ready)) {
-        game = await this.updateGamePeriod(game.id, GamePeriods.NIGHT);
+        game = await this.updateGamePeriod(game.id, GamePeriods.NIGHT, this.getNextRoleToPlay(game));
       }
 
       return { game, players, player };
@@ -151,14 +154,18 @@ export class GameService {
    * @async
    * @param {Id} id - The id of the game to update.
    * @param {GamePeriods} period - The new current period for the game.
+   * @param {PlayerRoles} [role] - The new current role for the game (optional).
    * @return {Promise<Game>} - A promise that resolves with the updated game object.
    * @throws {InternalServerErrorException} - If there was an error while updating the game period.
    */
-  async updateGamePeriod(id: Id, period: GamePeriods): Promise<Game> {
+  async updateGamePeriod(id: Id, period: GamePeriods, role?: PlayerRoles): Promise<Game> {
     try {
       return await this.prisma.game.update({
         where: { id },
-        data: { currentPeriod: period },
+        data: {
+          currentPeriod: period,
+          currentRole: role,
+        },
       });
     } catch (e) {
       throw new InternalServerErrorException(e);
@@ -186,5 +193,17 @@ export class GameService {
     });
 
     return result;
+  }
+
+  getNextRoleToPlay(game: Game): PlayerRoles | undefined {
+    const rolesByNumberOfPlayers: PlayerRoles[] = ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers];
+    let preparedOrderOfPlay: PlayerRoles[] = ORDER_OF_PLAY;
+
+    if (game.currentRole) {
+      const currentRoleIndex = ORDER_OF_PLAY.findIndex(role => role === game.currentRole);
+      preparedOrderOfPlay = ORDER_OF_PLAY.slice(currentRoleIndex + 1);
+    }
+
+    return preparedOrderOfPlay.find(role => rolesByNumberOfPlayers.includes(role));
   }
 }

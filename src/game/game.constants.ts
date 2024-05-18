@@ -56,7 +56,7 @@ export const ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
     PlayerRoles.GUARDIAN,
     PlayerRoles.MAFIA,
     PlayerRoles.GODFATHER,
-    PlayerRoles.MAFIA_LAWYER
+    PlayerRoles.MAFIA_LAWYER,
   ],
   11: [
     PlayerRoles.PEACEFUL_RESIDENT,
@@ -69,7 +69,7 @@ export const ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
     PlayerRoles.BEAUTY,
     PlayerRoles.MAFIA,
     PlayerRoles.GODFATHER,
-    PlayerRoles.MAFIA_LAWYER
+    PlayerRoles.MAFIA_LAWYER,
   ],
   12: [
     PlayerRoles.PEACEFUL_RESIDENT,
@@ -83,7 +83,7 @@ export const ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
     PlayerRoles.GUARDIAN,
     PlayerRoles.MAFIA,
     PlayerRoles.GODFATHER,
-    PlayerRoles.MAFIA_LAWYER
+    PlayerRoles.MAFIA_LAWYER,
   ],
   13: [
     PlayerRoles.PEACEFUL_RESIDENT,
@@ -98,7 +98,7 @@ export const ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
     PlayerRoles.MAFIA,
     PlayerRoles.MAFIA,
     PlayerRoles.GODFATHER,
-    PlayerRoles.MAFIA_LAWYER
+    PlayerRoles.MAFIA_LAWYER,
   ],
   14: [
     PlayerRoles.PEACEFUL_RESIDENT,
@@ -114,7 +114,7 @@ export const ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
     PlayerRoles.MAFIA,
     PlayerRoles.GODFATHER,
     PlayerRoles.TRIAD,
-    PlayerRoles.SENSEI
+    PlayerRoles.SENSEI,
   ],
   15: [
     PlayerRoles.PEACEFUL_RESIDENT,
@@ -131,7 +131,7 @@ export const ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
     PlayerRoles.MAFIA,
     PlayerRoles.GODFATHER,
     PlayerRoles.TRIAD,
-    PlayerRoles.SENSEI
+    PlayerRoles.SENSEI,
   ],
   16: [
     PlayerRoles.PEACEFUL_RESIDENT,
@@ -149,7 +149,7 @@ export const ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
     PlayerRoles.MAFIA,
     PlayerRoles.GODFATHER,
     PlayerRoles.TRIAD,
-    PlayerRoles.SENSEI
+    PlayerRoles.SENSEI,
   ],
   17: [
     PlayerRoles.PEACEFUL_RESIDENT,
@@ -168,7 +168,7 @@ export const ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
     PlayerRoles.MAFIA,
     PlayerRoles.GODFATHER,
     PlayerRoles.TRIAD,
-    PlayerRoles.SENSEI
+    PlayerRoles.SENSEI,
   ],
   18: [
     PlayerRoles.PEACEFUL_RESIDENT,
@@ -188,7 +188,7 @@ export const ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
     PlayerRoles.MAFIA_LAWYER,
     PlayerRoles.TRIAD,
     PlayerRoles.TRIAD,
-    PlayerRoles.SENSEI
+    PlayerRoles.SENSEI,
   ],
   19: [
     PlayerRoles.PEACEFUL_RESIDENT,
@@ -209,11 +209,11 @@ export const ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
     PlayerRoles.MAFIA_LAWYER,
     PlayerRoles.TRIAD,
     PlayerRoles.TRIAD,
-    PlayerRoles.SENSEI
+    PlayerRoles.SENSEI,
   ],
 };
 
-export const ORDER_OF_PLAY = [
+export const ORDER_OF_PLAY: PlayerRoles[] = [
   PlayerRoles.BEAUTY,
   PlayerRoles.MAFIA,
   PlayerRoles.AVENGER,
@@ -223,4 +223,4 @@ export const ORDER_OF_PLAY = [
   PlayerRoles.MAFIA_LAWYER,
   PlayerRoles.GODFATHER,
   PlayerRoles.SENSEI,
-]
+];
