@@ -39,14 +39,7 @@ export class PlayerService {
         select: this.DEFAULT_PLAYER_DB_SELECTION,
       });
 
-      return {
-        id: player.id,
-        role: player.role,
-        status: player.status,
-        userId: player.userId,
-        ready: player.ready,
-        username: player.user.username,
-      };
+      return this.serializePlayer(player);
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

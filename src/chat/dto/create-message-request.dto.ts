@@ -7,15 +7,10 @@ export class CreateMessageRequestDTO {
   @IsNotEmpty()
   @IsNumber()
   @Field()
-  userId: Id;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @Field()
   gameId: Id;
 
   @IsNotEmpty()
   @IsString()
   @Field()
-  text: Id;
+  text: string;
 }
