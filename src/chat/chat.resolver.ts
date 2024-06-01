@@ -5,7 +5,7 @@ import { User } from '../users/user.entity';
 import { PubSub } from 'graphql-subscriptions';
 import { CreateMessageRequestDTO } from './dto/create-message-request.dto';
 import { ChatService } from './chat.service';
-import { Message } from './message.entity';
+import { MessageResponseDTO } from './dto/message-response.dto';
 
 
 const pubSub = new PubSub();
@@ -20,11 +20,11 @@ export class ChatResolver {
 
   @UseGuards(AuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
-  @Mutation(() => Message)
+  @Mutation(() => MessageResponseDTO)
   async createGame(
     @Args('createMessageInput') createMessageInput: CreateMessageRequestDTO,
     @Context() context: { req: Request },
-  ): Promise<Message> {
+  ): Promise<MessageResponseDTO> {
     const user = context.req['user'] as User;
     return this.chatService.createMessage(createMessageInput, user);
   }

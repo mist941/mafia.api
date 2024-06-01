@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '../users/user.entity';
 import { CreateMessageRequestDTO } from './dto/create-message-request.dto';
-import { Message } from './message.entity';
+import { MessageResponseDTO } from './dto/message-response.dto';
 
 @Injectable()
 export class ChatService {
@@ -13,9 +13,9 @@ export class ChatService {
 
   }
 
-  async createMessage(createMessageInput: CreateMessageRequestDTO, user: User): Promise<Message> {
+  async createMessage(createMessageInput: CreateMessageRequestDTO, user: User): Promise<MessageResponseDTO> {
     try {
-      return this.prisma.message.create({
+      const message = await this.prisma.message.create({
         data: {
           userId: user.id,
           gameId: createMessageInput.gameId,
@@ -29,6 +29,14 @@ export class ChatService {
           text: true,
         },
       });
+
+      return {
+        id: message.id,
+        user: message.user,
+        game: message.game,
+        text: message.text,
+        createdAt: message.createdAt,
+      };
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
