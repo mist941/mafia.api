@@ -112,6 +112,7 @@ input SignupRequestDTO {
 type Subscription {
   invitePlayersSubscription(userId: Float!): InvitePlayersResponseDTO
   syncGameSubscription(gameId: Float!, playerId: Float!): GameResponseDTO
+  syncMessagesSubscription(gameId: Float!): MessageResponseDTO
 }
 
 type User {
