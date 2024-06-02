@@ -21,7 +21,7 @@ export class ChatResolver {
   @UseGuards(AuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Mutation(() => MessageResponseDTO)
-  async createGame(
+  async createMessage(
     @Args('createMessageInput') createMessageInput: CreateMessageRequestDTO,
     @Context() context: { req: Request },
   ): Promise<MessageResponseDTO> {

@@ -10,6 +10,7 @@ import { AppResolver } from './app.resolver';
 import { GameModule } from './game/game.module';
 import { PlayerModule } from './player/player.module';
 import { PubSub } from 'graphql-subscriptions';
+import { ChatModule } from './chat/chat.module';
 
 const pubSub = new PubSub();
 
@@ -28,6 +29,7 @@ const pubSub = new PubSub();
     AuthModule,
     GameModule,
     PlayerModule,
+    ChatModule
   ],
   controllers: [],
   providers: [

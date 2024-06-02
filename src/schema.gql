@@ -12,6 +12,11 @@ input CreateGameRequestDTO {
   private: Boolean!
 }
 
+input CreateMessageRequestDTO {
+  gameId: Float!
+  text: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -46,9 +51,18 @@ type InvitePlayersResponseDTO {
   userIds: [ID!]!
 }
 
+type MessageResponseDTO {
+  createdAt: DateTime!
+  game: Game!
+  id: ID!
+  text: String!
+  user: User!
+}
+
 type Mutation {
   addNewPlayer(addNewPlayerInput: AddNewPlayerRequestDTO!): GameResponseDTO!
   createGame(createGameInput: CreateGameRequestDTO!): GameResponseDTO!
+  createMessage(createMessageInput: CreateMessageRequestDTO!): MessageResponseDTO!
   invitePlayers(invitePlayersInput: InvitePlayersRequestDTO!): InvitePlayersResponseDTO!
   readyToPlay(readyToPlayInput: ReadyToPlayRequestDTO!): GameResponseDTO!
   signin(signinInput: SigninRequestDTO!): SignResponseDTO!
