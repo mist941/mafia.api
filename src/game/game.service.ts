@@ -171,7 +171,7 @@ export class GameService {
       let players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(gameId);
 
       if (game.currentPeriod === GamePeriods.DAY && players.every(player => player.madeAction)) {
-        return this.goRoDay(game, playerId);
+        return this.goToDay(game, playerId);
       }
       if (game.currentPeriod === GamePeriods.NIGHT && LAST_ROLE_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers] === player.role) {
         return this.goToNight(game, playerId);
@@ -183,7 +183,7 @@ export class GameService {
     }
   }
 
-  async goRoDay(game: Game, playerId: Id): Promise<GameResponseDTO> {
+  async goToDay(game: Game, playerId: Id): Promise<GameResponseDTO> {
     const nextRole = this.getNextRoleToPlay(game);
     const player = await this.playerService.updatePlayer(playerId, { madeAction: false });
     const players = await this.playerService.setAllPlayersActionStatusAsFalse(game.id);
