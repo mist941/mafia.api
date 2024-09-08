@@ -11,7 +11,7 @@ import { PlayerResponseDTO } from '../player/dto/player-response.dto';
 import { AddNewPlayerRequestDTO } from './dto/add-new-player-request.dto';
 import { Id } from '../common.types';
 import { ReadyToPlayRequestDTO } from './dto/ready-to-play-request.dto';
-import { ORDER_OF_PLAY, ROLES_BY_NUMBER_OF_PLAYERS } from './game.constants';
+import { LAST_ROLE_BY_NUMBER_OF_PLAYERS, ORDER_OF_PLAY, ROLES_BY_NUMBER_OF_PLAYERS } from './game.constants';
 import { CreateActionRequestDTO } from './dto/create-action-request.dto';
 import { ActionService } from '../action/action.service';
 
@@ -171,19 +171,22 @@ export class GameService {
       let players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(gameId);
 
       const nextRole = this.getNextRoleToPlay(game);
-      if (!nextRole) {
+      if (game.currentPeriod === GamePeriods.DAY && players.every(player => player.madeAction)) {
+        players = await this.playerService.setAllPlayersActionStatusAsFalse(gameId);
+        game = await this.updateGame(gameId, {
+          currentPeriod: GamePeriods.NIGHT,
+          step: game.step + 1,
+          currentRole: nextRole,
+        });
+      } else if (game.currentPeriod === GamePeriods.NIGHT && LAST_ROLE_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers] === player.role) {
         players = await this.playerService.setAllPlayersActionStatusAsFalse(gameId);
         game = await this.updateGame(gameId, {
           currentPeriod: GamePeriods.DAY,
           step: game.step + 1,
-          currentRole: null
+          currentRole: null,
         });
-      }
-      if (nextRole) {
-        game = await this.updateGame(gameId, {
-          currentPeriod: GamePeriods.NIGHT,
-          currentRole: nextRole,
-        });
+      } else {
+        game = await this.updateGame(gameId, { currentRole: nextRole });
       }
 
       return { game, players, player };
