@@ -25,4 +25,7 @@ export class Game {
 
   @Field(() => Boolean)
   private: Boolean;
+
+  @Field(() => Int)
+  step: number;
 }

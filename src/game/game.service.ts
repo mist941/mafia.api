@@ -150,6 +150,16 @@ export class GameService {
     }
   }
 
+  /**
+   * Updates the game state after a player has taken an action.
+   * This method retrieves the current game and player information,
+   * determines the next role to play, and updates the game period if necessary.
+   *
+   * @param {Id} gameId - The unique identifier of the game to be updated.
+   * @param {Id} playerId - The unique identifier of the player who has just taken an action.
+   * @return {Promise<GameResponseDTO>} - A promise that resolves to the updated game state, including the list of players and the current player information.
+   * @throws {InternalServerErrorException} - If an error occurs while updating the game.
+   */
   async updateGameAfterAnActin(gameId: Id, playerId: Id): Promise<GameResponseDTO> {
     try {
       let game: Game = await this.findGameById(gameId);
