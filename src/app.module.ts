@@ -11,6 +11,7 @@ import { GameModule } from './game/game.module';
 import { PlayerModule } from './player/player.module';
 import { PubSub } from 'graphql-subscriptions';
 import { ChatModule } from './chat/chat.module';
+import { ActionModule } from './action/action.module';
 
 const pubSub = new PubSub();
 
@@ -29,7 +30,8 @@ const pubSub = new PubSub();
     AuthModule,
     GameModule,
     PlayerModule,
-    ChatModule
+    ChatModule,
+    ActionModule
   ],
   controllers: [],
   providers: [

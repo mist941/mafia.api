@@ -10,6 +10,12 @@ export class Message {
   @Field(() => String)
   text: string;
 
+  @Field(() => Boolean)
+  mafiaChat: boolean;
+
+  @Field(() => Game)
+  triadaChat: boolean;
+
   @Field()
   createdAt: Date;
 

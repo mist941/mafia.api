@@ -26,6 +26,7 @@ model Action {
   id             Int      @id @default(autoincrement())
   createdAt      DateTime @default(now())
   period         String
+  actionType     String   @default("")
   step           Int
   gameId         Int
   game           Game     @relation(fields: [gameId], references: [id])
@@ -61,11 +62,13 @@ model User {
 }
 
 model Message {
-  id        Int      @id @default(autoincrement())
-  text      String
-  createdAt DateTime @default(now())
-  gameId    Int
-  game      Game     @relation(fields: [gameId], references: [id])
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  id         Int      @id @default(autoincrement())
+  text       String
+  createdAt  DateTime @default(now())
+  mafiaChat  Boolean  @default(false)
+  triadaChat Boolean  @default(false)
+  gameId     Int
+  game       Game     @relation(fields: [gameId], references: [id])
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
 }
