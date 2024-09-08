@@ -168,8 +168,11 @@ export class GameService {
     try {
       let game: Game = await this.findGameById(gameId);
       let players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(gameId);
+      const isReadyForNight = players
+        .filter(player => player.id !== playerId)
+        .every(player => player.madeAction);
 
-      if (game.currentPeriod === GamePeriods.DAY && players.every(player => player.madeAction)) {
+      if (game.currentPeriod === GamePeriods.DAY && isReadyForNight) {
         return this.goToNight(game, playerId);
       }
       if (
@@ -178,6 +181,10 @@ export class GameService {
       ) {
         return this.goToDay(game, playerId);
       }
+      if (game.currentPeriod === GamePeriods.DAY) {
+        return this.vote(game, playerId);
+      }
+
       return this.goToNextRole(game, playerId);
 
     } catch (e) {
@@ -237,6 +244,19 @@ export class GameService {
     const players = await this.playerService.getPlayersByGameId(game.id);
     const updatedGame = await this.updateGame(game.id, { currentRole: nextRole });
     return { game: updatedGame, players, player };
+  }
+
+  /**
+   * Records a vote from a player in a game and updates the player's action status.
+   *
+   * @param {Game} game - The current game instance.
+   * @param {Id} playerId - The unique identifier of the player who is voting.
+   * @return {Promise<GameResponseDTO>} The updated game state including players' statuses and the voting player's updated information.
+   */
+  async vote(game: Game, playerId: Id): Promise<GameResponseDTO> {
+    const player = await this.playerService.updatePlayer(playerId, { madeAction: true });
+    const players = await this.playerService.getPlayersByGameId(game.id);
+    return { game, players, player };
   }
 
   /**
