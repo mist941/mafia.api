@@ -15,11 +15,10 @@ export class CreateActionRequestDTO {
   @IsNumber()
   @Field()
   playerId: Id;
-
-  @IsNotEmpty()
+  
   @IsNumber()
   @Field()
-  targetPlayerId: Id;
+  targetPlayerId?: Id;
 
   @IsNotEmpty()
   @IsString()

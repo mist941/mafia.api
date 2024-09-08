@@ -18,7 +18,7 @@ export class Action {
   @Field(() => String)
   actionType: ActionTypes;
 
-  @Field(() => Player)
+  @Field({ nullable: true })
   targetPlayerId: Player;
 
   @Field(() => Player)

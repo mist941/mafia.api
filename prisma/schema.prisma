@@ -31,8 +31,8 @@ model Action {
   step           Int
   gameId         Int
   game           Game     @relation(fields: [gameId], references: [id])
-  targetPlayerId Int
-  targetPlayer   Player   @relation(fields: [targetPlayerId], references: [id], name: "targetPlayer")
+  targetPlayerId Int?
+  targetPlayer   Player?  @relation(fields: [targetPlayerId], references: [id], name: "targetPlayer")
   sourcePlayerId Int
   sourcePlayer   Player   @relation(fields: [sourcePlayerId], references: [id], name: "sourcePlayer")
 }
