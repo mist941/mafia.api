@@ -63,14 +63,14 @@ export class PlayerService {
 
   async setAllPlayersActionStatusAsFalse(gameId: Id): Promise<PlayerResponseDTO[]> {
     try {
-      const players = await this.prisma.player.updateMany({
+      await this.prisma.player.updateMany({
         where: { gameId },
         data: {
           madeAction: false,
         },
       });
 
-      return players.map(this.serializePlayer);
+      return this.getPlayersByGameId(gameId);
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
