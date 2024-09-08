@@ -6,6 +6,15 @@ input AddNewPlayerRequestDTO {
   gameId: Float!
 }
 
+input CreateActionRequestDTO {
+  actionType: String!
+  gameId: Float!
+  period: String!
+  playerId: Float!
+  step: Float!
+  targetPlayerId: Float!
+}
+
 input CreateGameRequestDTO {
   gameName: String!
   numberOfPlayers: Float!
@@ -62,6 +71,7 @@ type MessageResponseDTO {
 
 type Mutation {
   addNewPlayer(addNewPlayerInput: AddNewPlayerRequestDTO!): GameResponseDTO!
+  createAction(createActionInput: CreateActionRequestDTO!): GameResponseDTO!
   createGame(createGameInput: CreateGameRequestDTO!): GameResponseDTO!
   createMessage(createMessageInput: CreateMessageRequestDTO!): MessageResponseDTO!
   invitePlayers(invitePlayersInput: InvitePlayersRequestDTO!): InvitePlayersResponseDTO!

@@ -11,6 +11,7 @@ import { PubSub } from 'graphql-subscriptions';
 import { Id } from '../common.types';
 import { AddNewPlayerRequestDTO } from './dto/add-new-player-request.dto';
 import { ReadyToPlayRequestDTO } from './dto/ready-to-play-request.dto';
+import { CreateActionRequestDTO } from './dto/create-action-request.dto';
 
 const pubSub = new PubSub();
 
@@ -43,6 +44,24 @@ export class GameResolver {
     try {
       const user = context.req['user'] as User;
       const game: GameResponseDTO = await this.gameService.addNewPlayer(addNewPlayerInput, user);
+
+      pubSub.publish('syncGame', game);
+
+      return game;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Mutation(() => GameResponseDTO)
+  async createAction(
+    @Args('createActionInput') createActionInput: CreateActionRequestDTO,
+    @Context() context: { req: Request },
+  ): Promise<GameResponseDTO> {
+    try {
+      const game: GameResponseDTO = await this.gameService.createAction(createActionInput);
 
       pubSub.publish('syncGame', game);
 
