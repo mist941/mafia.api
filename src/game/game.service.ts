@@ -125,7 +125,10 @@ export class GameService {
       const players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(readyToPlayInput.gameId);
 
       if (players.every(player => player.ready)) {
-        game = await this.updateGamePeriod(game.id, GamePeriods.NIGHT, this.getNextRoleToPlay(game));
+        game = await this.updateGame(game.id, {
+          currentPeriod: GamePeriods.NIGHT,
+          currentRole: this.getNextRoleToPlay(game),
+        });
       }
 
       return { game, players, player };
@@ -168,10 +171,16 @@ export class GameService {
 
       const nextRole = this.getNextRoleToPlay(game);
       if (!nextRole) {
-        game = await this.updateGamePeriod(gameId, GamePeriods.DAY);
+        game = await this.updateGame(gameId, {
+          currentPeriod: GamePeriods.DAY,
+          step: game.step + 1,
+        });
       }
       if (nextRole) {
-        game = await this.updateGamePeriod(gameId, GamePeriods.NIGHT, nextRole);
+        game = await this.updateGame(gameId, {
+          currentPeriod: GamePeriods.NIGHT,
+          currentRole: nextRole,
+        });
       }
 
       return { game, players, player };
@@ -198,23 +207,21 @@ export class GameService {
   }
 
   /**
-   * Updates the current period of a game with the specified id.
+   * Updates the specified game with the provided parameters.
    *
-   * @async
-   * @param {Id} id - The id of the game to update.
-   * @param {GamePeriods} period - The new current period for the game.
-   * @param {PlayerRoles} [role] - The new current role for the game (optional).
-   * @return {Promise<Game>} - A promise that resolves with the updated game object.
-   * @throws {InternalServerErrorException} - If there was an error while updating the game period.
+   * @param {Id} id - The unique identifier of the game to be updated.
+   * @param {Partial<Game>} params - The game parameters to be updated.
+   * @return {Promise<Game>} - The updated game object.
+   * @throws {InternalServerErrorException} - If an error occurs during the update process.
    */
-  async updateGamePeriod(id: Id, period: GamePeriods, role?: PlayerRoles): Promise<Game> {
+  async updateGame(id: Id, params: Partial<Game>): Promise<Game> {
     try {
       return await this.prisma.game.update({
         where: { id },
         data: {
-          currentPeriod: period,
-          currentRole: role,
-          step: { increment: 1 },
+          currentPeriod: params.currentPeriod,
+          currentRole: params.currentRole,
+          step: params.step,
         },
       });
     } catch (e) {
