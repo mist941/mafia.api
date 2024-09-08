@@ -167,32 +167,54 @@ export class GameService {
   async updateGameAfterAnActin(gameId: Id, playerId: Id): Promise<GameResponseDTO> {
     try {
       let game: Game = await this.findGameById(gameId);
-      const player: PlayerResponseDTO = await this.playerService.updatePlayer(playerId, { madeAction: true });
+      let player: PlayerResponseDTO = await this.playerService.getPlayerByGameId(gameId);
       let players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(gameId);
 
-      const nextRole = this.getNextRoleToPlay(game);
       if (game.currentPeriod === GamePeriods.DAY && players.every(player => player.madeAction)) {
-        players = await this.playerService.setAllPlayersActionStatusAsFalse(gameId);
-        game = await this.updateGame(gameId, {
-          currentPeriod: GamePeriods.NIGHT,
-          step: game.step + 1,
-          currentRole: nextRole,
-        });
-      } else if (game.currentPeriod === GamePeriods.NIGHT && LAST_ROLE_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers] === player.role) {
-        players = await this.playerService.setAllPlayersActionStatusAsFalse(gameId);
-        game = await this.updateGame(gameId, {
-          currentPeriod: GamePeriods.DAY,
-          step: game.step + 1,
-          currentRole: null,
-        });
-      } else {
-        game = await this.updateGame(gameId, { currentRole: nextRole });
+        return this.goRoDay(game, playerId);
       }
+      if (game.currentPeriod === GamePeriods.NIGHT && LAST_ROLE_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers] === player.role) {
+        return this.goToNight(game, playerId);
+      }
+      return this.goToNextRole(game, playerId);
 
-      return { game, players, player };
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
+  }
+
+  async goRoDay(game: Game, playerId: Id): Promise<GameResponseDTO> {
+    const nextRole = this.getNextRoleToPlay(game);
+    const player = await this.playerService.updatePlayer(playerId, { madeAction: false });
+    const players = await this.playerService.setAllPlayersActionStatusAsFalse(game.id);
+    game = await this.updateGame(game.id, {
+      currentPeriod: GamePeriods.NIGHT,
+      step: game.step + 1,
+      currentRole: nextRole,
+    });
+
+    return { game, players, player };
+  }
+
+  async goToNight(game: Game, playerId: Id): Promise<GameResponseDTO> {
+    const nextRole = this.getNextRoleToPlay(game);
+    const player = await this.playerService.updatePlayer(playerId, { madeAction: false });
+    const players = await this.playerService.setAllPlayersActionStatusAsFalse(game.id);
+    game = await this.updateGame(game.id, {
+      currentPeriod: GamePeriods.DAY,
+      step: game.step + 1,
+      currentRole: nextRole,
+    });
+
+    return { game, players, player };
+  }
+
+  async goToNextRole(game: Game, playerId: Id): Promise<GameResponseDTO> {
+    const nextRole = this.getNextRoleToPlay(game);
+    const player = await this.playerService.updatePlayer(playerId, { madeAction: true });
+    const players = await this.playerService.getPlayersByGameId(game.id);
+    game = await this.updateGame(game.id, { currentRole: nextRole });
+    return { game, players, player };
   }
 
   /**
