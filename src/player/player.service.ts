@@ -77,19 +77,6 @@ export class PlayerService {
     }
   }
 
-  async getPlayerByGameId(gameId: Id): Promise<PlayerResponseDTO> {
-    try {
-      const player: Player = await this.prisma.player.findFirst({
-        where: { gameId },
-        select: this.DEFAULT_PLAYER_DB_SELECTION,
-      });
-
-      return this.serializePlayer(player);
-    } catch (e) {
-      throw new InternalServerErrorException(e);
-    }
-  }
-
   async getPlayersByGameId(gameId: Id): Promise<PlayerResponseDTO[]> {
     try {
       const players: Player[] = await this.prisma.player.findMany({

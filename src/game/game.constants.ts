@@ -227,14 +227,14 @@ export const ORDER_OF_PLAY: PlayerRoles[] = [
 
 export const LAST_ROLE_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles } = {
   5: PlayerRoles.DOCTOR,
-  6: PlayerRoles.COMMISSAR,
+  6: PlayerRoles.GODFATHER,
   7: PlayerRoles.GODFATHER,
   8: PlayerRoles.GODFATHER,
   9: PlayerRoles.GODFATHER,
   10: PlayerRoles.GODFATHER,
   11: PlayerRoles.GODFATHER,
   12: PlayerRoles.GODFATHER,
-  13: PlayerRoles.SENSEI,
+  13: PlayerRoles.GODFATHER,
   14: PlayerRoles.SENSEI,
   15: PlayerRoles.SENSEI,
   16: PlayerRoles.SENSEI,

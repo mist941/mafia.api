@@ -128,7 +128,7 @@ export class GameService {
         game = await this.updateGame(game.id, {
           currentPeriod: GamePeriods.NIGHT,
           currentRole: this.getNextRoleToPlay(game),
-          step: 1,
+          step: game.step + 1,
         });
       }
 
@@ -155,26 +155,28 @@ export class GameService {
   }
 
   /**
-   * Updates the game state after a player has taken an action.
-   * This method retrieves the current game and player information,
-   * determines the next role to play, and updates the game period if necessary.
+   * Updates the game state after a player has performed an action.
    *
-   * @param {Id} gameId - The unique identifier of the game to be updated.
-   * @param {Id} playerId - The unique identifier of the player who has just taken an action.
-   * @return {Promise<GameResponseDTO>} - A promise that resolves to the updated game state, including the list of players and the current player information.
-   * @throws {InternalServerErrorException} - If an error occurs while updating the game.
+   * @param {Id} gameId - The unique identifier of the game being updated.
+   * @param {Id} playerId - The unique identifier of the player who has just performed an action.
+   *
+   * @return {Promise<GameResponseDTO>} - A promise that resolves to the updated game state.
+   *
+   * @throws {InternalServerErrorException} - If an error occurs while updating the game state.
    */
   async updateGameAfterAnActin(gameId: Id, playerId: Id): Promise<GameResponseDTO> {
     try {
       let game: Game = await this.findGameById(gameId);
-      let player: PlayerResponseDTO = await this.playerService.getPlayerByGameId(gameId);
       let players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(gameId);
 
       if (game.currentPeriod === GamePeriods.DAY && players.every(player => player.madeAction)) {
-        return this.goToDay(game, playerId);
-      }
-      if (game.currentPeriod === GamePeriods.NIGHT && LAST_ROLE_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers] === player.role) {
         return this.goToNight(game, playerId);
+      }
+      if (
+        game.currentPeriod === GamePeriods.NIGHT &&
+        LAST_ROLE_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers] === game.currentRole
+      ) {
+        return this.goToDay(game, playerId);
       }
       return this.goToNextRole(game, playerId);
 
@@ -183,38 +185,58 @@ export class GameService {
     }
   }
 
+  /**
+   * Transition the game to the day period, update the player and game statuses accordingly.
+   *
+   * @param {Game} game - The current game instance.
+   * @param {Id} playerId - The ID of the player to update.
+   * @return {Promise<GameResponseDTO>} A promise that resolves to a data transfer object containing the updated game and player information.
+   */
   async goToDay(game: Game, playerId: Id): Promise<GameResponseDTO> {
+    const player = await this.playerService.updatePlayer(playerId, { madeAction: false });
+    const players = await this.playerService.setAllPlayersActionStatusAsFalse(game.id);
+    const updatedGame = await this.updateGame(game.id, {
+      currentPeriod: GamePeriods.DAY,
+      step: game.step + 1,
+      currentRole: null,
+    });
+
+    return { game: updatedGame, players, player };
+  }
+
+  /**
+   * Transitions the game to the night phase, updating player and game state.
+   *
+   * @param {Game} game - The current state of the game.
+   * @param {Id} playerId - The identifier of the player initiating the transition.
+   * @return {Promise<GameResponseDTO>} - An object containing the updated game and player states.
+   */
+  async goToNight(game: Game, playerId: Id): Promise<GameResponseDTO> {
     const nextRole = this.getNextRoleToPlay(game);
     const player = await this.playerService.updatePlayer(playerId, { madeAction: false });
     const players = await this.playerService.setAllPlayersActionStatusAsFalse(game.id);
-    game = await this.updateGame(game.id, {
+    const updatedGame = await this.updateGame(game.id, {
       currentPeriod: GamePeriods.NIGHT,
       step: game.step + 1,
       currentRole: nextRole,
     });
 
-    return { game, players, player };
+    return { game: updatedGame, players, player };
   }
 
-  async goToNight(game: Game, playerId: Id): Promise<GameResponseDTO> {
-    const nextRole = this.getNextRoleToPlay(game);
-    const player = await this.playerService.updatePlayer(playerId, { madeAction: false });
-    const players = await this.playerService.setAllPlayersActionStatusAsFalse(game.id);
-    game = await this.updateGame(game.id, {
-      currentPeriod: GamePeriods.DAY,
-      step: game.step + 1,
-      currentRole: nextRole,
-    });
-
-    return { game, players, player };
-  }
-
+  /**
+   * Advances the game to the next role and updates the player's status.
+   *
+   * @param {Game} game - The current game instance.
+   * @param {Id} playerId - The ID of the player making the action.
+   * @return {Promise<GameResponseDTO>} - A promise resolving to the updated game and player data.
+   */
   async goToNextRole(game: Game, playerId: Id): Promise<GameResponseDTO> {
     const nextRole = this.getNextRoleToPlay(game);
     const player = await this.playerService.updatePlayer(playerId, { madeAction: true });
     const players = await this.playerService.getPlayersByGameId(game.id);
-    game = await this.updateGame(game.id, { currentRole: nextRole });
-    return { game, players, player };
+    const updatedGame = await this.updateGame(game.id, { currentRole: nextRole });
+    return { game: updatedGame, players, player };
   }
 
   /**
