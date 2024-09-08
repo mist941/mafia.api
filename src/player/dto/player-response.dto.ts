@@ -19,4 +19,7 @@ export class PlayerResponseDTO {
 
   @Field(() => String)
   username: string;
+
+  @Field(() => Boolean)
+  madeAction: boolean;
 }

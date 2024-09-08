@@ -15,6 +15,7 @@ export class PlayerService {
     userId: true,
     ready: true,
     gameId: true,
+    madeAction: true,
     user: {
       select: {
         username: true,
@@ -40,6 +41,36 @@ export class PlayerService {
       });
 
       return this.serializePlayer(player);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  async updatePlayer(id: Id, params: Partial<Player>): Promise<PlayerResponseDTO> {
+    try {
+      const player: Player = await this.prisma.player.update({
+        where: { id },
+        data: {
+          madeAction: params.madeAction,
+        },
+      });
+
+      return this.serializePlayer(player);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  async setAllPlayersActionStatusAsFalse(gameId: Id): Promise<PlayerResponseDTO[]> {
+    try {
+      const players = await this.prisma.player.updateMany({
+        where: { gameId },
+        data: {
+          madeAction: false,
+        },
+      });
+
+      return players.map(this.serializePlayer);
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
@@ -80,6 +111,7 @@ export class PlayerService {
       userId: player.userId,
       ready: player.ready,
       username: player.user.username,
+      madeAction: player.madeAction,
     };
   }
 }

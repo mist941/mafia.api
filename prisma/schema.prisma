@@ -42,6 +42,7 @@ model Player {
   status       String
   role         String
   ready        Boolean  @default(false)
+  madeAction   Boolean  @default(false)
   gameId       Int
   game         Game     @relation(fields: [gameId], references: [id])
   userId       Int

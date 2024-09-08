@@ -82,6 +82,7 @@ type Mutation {
 
 type PlayerResponseDTO {
   id: Float!
+  madeAction: Boolean!
   ready: Boolean!
   role: String!
   status: String!

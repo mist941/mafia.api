@@ -128,7 +128,7 @@ export class GameService {
         game = await this.updateGame(game.id, {
           currentPeriod: GamePeriods.NIGHT,
           currentRole: this.getNextRoleToPlay(game),
-          step: 1
+          step: 1,
         });
       }
 
@@ -167,11 +167,12 @@ export class GameService {
   async updateGameAfterAnActin(gameId: Id, playerId: Id): Promise<GameResponseDTO> {
     try {
       let game: Game = await this.findGameById(gameId);
-      const player: PlayerResponseDTO = await this.playerService.readyToPlay(playerId);
-      const players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(gameId);
+      const player: PlayerResponseDTO = await this.playerService.updatePlayer(playerId, { madeAction: true });
+      let players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(gameId);
 
       const nextRole = this.getNextRoleToPlay(game);
       if (!nextRole) {
+        players = await this.playerService.setAllPlayersActionStatusAsFalse(gameId);
         game = await this.updateGame(gameId, {
           currentPeriod: GamePeriods.DAY,
           step: game.step + 1,

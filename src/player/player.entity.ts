@@ -19,4 +19,7 @@ export class Player {
 
   @Field(() => String)
   role: string;
+
+  @Field(() => Boolean)
+  madeAction: boolean;
 }
