@@ -20,7 +20,7 @@ model Game {
   ownerId         Int
   owner           User      @relation(fields: [ownerId], references: [id])
   Message         Message[]
-  step            Int       @default(1)
+  step            Int       @default(0)
 }
 
 model Action {

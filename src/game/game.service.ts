@@ -214,6 +214,7 @@ export class GameService {
         data: {
           currentPeriod: period,
           currentRole: role,
+          step: { increment: 1 },
         },
       });
     } catch (e) {

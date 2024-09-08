@@ -26,6 +26,6 @@ export class Game {
   @Field(() => Boolean)
   private: Boolean;
 
-  @Field(() => Int)
+  @Field({ nullable: false, defaultValue: 0 })
   step: number;
 }
