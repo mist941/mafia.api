@@ -128,6 +128,7 @@ export class GameService {
         game = await this.updateGame(game.id, {
           currentPeriod: GamePeriods.NIGHT,
           currentRole: this.getNextRoleToPlay(game),
+          step: 1
         });
       }
 
