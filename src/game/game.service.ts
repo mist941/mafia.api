@@ -134,6 +134,13 @@ export class GameService {
     }
   }
 
+  /**
+   * Creates a new action based on the input provided and updates the game state.
+   *
+   * @param {CreateActionRequestDTO} createActionInput - The input data required to create a new action.
+   * @return {Promise<GameResponseDTO>} - A promise that resolves to the updated game state after the action.
+   * @throws {InternalServerErrorException} - Throws an exception if the action creation or game update fails.
+   */
   async createAction(createActionInput: CreateActionRequestDTO): Promise<GameResponseDTO> {
     try {
       await this.actionService.createAction(createActionInput);
@@ -149,8 +156,16 @@ export class GameService {
       const player: PlayerResponseDTO = await this.playerService.readyToPlay(playerId);
       const players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(gameId);
 
+      const nextRole = this.getNextRoleToPlay(game);
+      if (!nextRole) {
+        game = await this.updateGamePeriod(gameId, GamePeriods.DAY);
+      }
+      if (nextRole) {
+        game = await this.updateGamePeriod(gameId, GamePeriods.NIGHT, nextRole);
+      }
+
       return { game, players, player };
-    }catch (e){
+    } catch (e) {
       throw new InternalServerErrorException(e);
     }
   }
