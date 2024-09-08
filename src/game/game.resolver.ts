@@ -40,16 +40,16 @@ export class GameResolver {
     @Args('addNewPlayerInput') addNewPlayerInput: AddNewPlayerRequestDTO,
     @Context() context: { req: Request },
   ): Promise<GameResponseDTO> {
-    const user = context.req['user'] as User;
-    const game: GameResponseDTO = await this.gameService.addNewPlayer(addNewPlayerInput, user);
-
     try {
-      pubSub.publish('syncGame', game);
-    } catch (e) {
-      throw new InternalServerErrorException(e);
-    }
+      const user = context.req['user'] as User;
+      const game: GameResponseDTO = await this.gameService.addNewPlayer(addNewPlayerInput, user);
 
-    return game;
+      pubSub.publish('syncGame', game);
+
+      return game;
+    } catch (e) {
+      throw e;
+    }
   }
 
   @UseGuards(AuthGuard)

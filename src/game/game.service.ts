@@ -12,6 +12,8 @@ import { AddNewPlayerRequestDTO } from './dto/add-new-player-request.dto';
 import { Id } from '../common.types';
 import { ReadyToPlayRequestDTO } from './dto/ready-to-play-request.dto';
 import { ORDER_OF_PLAY, ROLES_BY_NUMBER_OF_PLAYERS } from './game.constants';
+import { CreateActionRequestDTO } from './dto/create-action-request.dto';
+import { ActionService } from '../action/action.service';
 
 /**
  * Service class for managing game-related operations.
@@ -22,6 +24,7 @@ export class GameService {
   constructor(
     private prisma: PrismaService,
     private playerService: PlayerService,
+    private actionService: ActionService,
   ) {
 
   }
@@ -99,7 +102,7 @@ export class GameService {
 
       return { game, players: [...gamePlayers, newPlayer], player: newPlayer };
     } catch (e) {
-      throw e;
+      throw new InternalServerErrorException(e);
     }
   }
 
@@ -127,7 +130,28 @@ export class GameService {
 
       return { game, players, player };
     } catch (e) {
-      throw e;
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  async createAction(createActionInput: CreateActionRequestDTO): Promise<GameResponseDTO> {
+    try {
+      await this.actionService.createAction(createActionInput);
+      return this.updateGameAfterAnActin(createActionInput.gameId, createActionInput.playerId);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  async updateGameAfterAnActin(gameId: Id, playerId: Id): Promise<GameResponseDTO> {
+    try {
+      let game: Game = await this.findGameById(gameId);
+      const player: PlayerResponseDTO = await this.playerService.readyToPlay(playerId);
+      const players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(gameId);
+
+      return { game, players, player };
+    }catch (e){
+      throw new InternalServerErrorException(e);
     }
   }
 

@@ -4,6 +4,7 @@ import { GameService } from './game.service';
 import { TokenModule } from '../token/token.module';
 import { UserModule } from '../users/user.module';
 import { PlayerModule } from '../player/player.module';
+import { ActionService } from '../action/action.service';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PlayerModule } from '../player/player.module';
   providers: [
     GameResolver,
     GameService,
+    ActionService
   ],
 })
 export class GameModule {
