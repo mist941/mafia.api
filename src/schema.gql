@@ -12,7 +12,7 @@ input CreateActionRequestDTO {
   period: String!
   playerId: Float!
   step: Float!
-  targetPlayerId: Float!
+  targetPlayerId: Float
 }
 
 input CreateGameRequestDTO {

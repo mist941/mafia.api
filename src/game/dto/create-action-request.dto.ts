@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, ValidateIf } from 'class-validator';
 import { Id } from '../../common.types';
 import { ActionTypes } from '../../action/action.types';
 import { GamePeriods } from '../game.types';
@@ -15,9 +15,10 @@ export class CreateActionRequestDTO {
   @IsNumber()
   @Field()
   playerId: Id;
-  
+
+  @ValidateIf((_, value) => value)
   @IsNumber()
-  @Field()
+  @Field({ nullable: true })
   targetPlayerId?: Id;
 
   @IsNotEmpty()

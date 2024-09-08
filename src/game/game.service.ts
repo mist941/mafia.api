@@ -176,6 +176,7 @@ export class GameService {
         game = await this.updateGame(gameId, {
           currentPeriod: GamePeriods.DAY,
           step: game.step + 1,
+          currentRole: null
         });
       }
       if (nextRole) {

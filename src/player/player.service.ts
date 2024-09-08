@@ -53,6 +53,7 @@ export class PlayerService {
         data: {
           madeAction: params.madeAction,
         },
+        select: this.DEFAULT_PLAYER_DB_SELECTION,
       });
 
       return this.serializePlayer(player);

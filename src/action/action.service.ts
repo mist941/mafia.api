@@ -11,7 +11,7 @@ export class ActionService {
 
   async createAction(createActionInput: CreateActionRequestDTO): Promise<void> {
     try {
-      this.prisma.action.create({
+      await this.prisma.action.create({
         data: {
           actionType: createActionInput.actionType,
           sourcePlayerId: createActionInput.playerId,
