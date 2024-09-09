@@ -14,6 +14,7 @@ import { ReadyToPlayRequestDTO } from './dto/ready-to-play-request.dto';
 import { LAST_ROLE_BY_NUMBER_OF_PLAYERS, ORDER_OF_PLAY, ROLES_BY_NUMBER_OF_PLAYERS } from './game.constants';
 import { CreateActionRequestDTO } from './dto/create-action-request.dto';
 import { ActionService } from '../action/action.service';
+import { GetGameDataRequestDTO } from './dto/get-game-data-request.dto';
 
 /**
  * Service class for managing game-related operations.
@@ -29,14 +30,19 @@ export class GameService {
 
   }
 
-  /**
-   * Creates a new game.
-   *
-   * @param {CreateGameRequestDTO} createGameInput - The input data for creating the game.
-   * @param {User} user - The user creating the game.
-   * @returns {Promise<GameResponseDTO>} A promise that resolves to the newly created game response.
-   * @throws {InternalServerErrorException} If an error occurs while creating the game.
-   */
+  async getGameData(getGameDataInput: GetGameDataRequestDTO): Promise<GameResponseDTO> {
+    const game: Game = await this.findGameById(getGameDataInput.gameId);
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    const players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(getGameDataInput.gameId);
+    const player: PlayerResponseDTO = await this.playerService.getPlayerById(getGameDataInput.playerId);
+
+    return {game, players, player};
+  }
+
   async createGame(createGameInput: CreateGameRequestDTO, user: User): Promise<GameResponseDTO> {
     try {
       const game: Game = await this.prisma.game.create({
@@ -61,15 +67,6 @@ export class GameService {
     }
   }
 
-  /**
-   * Adds a new player to a game.
-   *
-   * @param {AddNewPlayerRequestDTO} createGameInput - The input data for creating a new player.
-   * @param {User} user - The user to be added to the game.
-   * @returns {Promise<GameResponseDTO>} - A promise that resolves to the updated game response.
-   * @throws {NotFoundException} - If the game is not found.
-   * @throws {ConflictException} - If the game is full or the user is already added to the game.
-   */
   async addNewPlayer(createGameInput: AddNewPlayerRequestDTO, user: User): Promise<GameResponseDTO> {
     const game: Game = await this.findGameById(createGameInput.gameId);
 
@@ -106,13 +103,6 @@ export class GameService {
     }
   }
 
-  /**
-   * Marks a player as ready to play in a game and returns game information and player status.
-   *
-   * @param {ReadyToPlayRequestDTO} readyToPlayInput - The input data containing the game ID and player ID.
-   * @returns {Promise<GameResponseDTO>} - The game information and player status.
-   * @throws {NotFoundException} - If the game is not found.
-   */
   async readyToPlay(readyToPlayInput: ReadyToPlayRequestDTO): Promise<GameResponseDTO> {
     let game: Game = await this.findGameById(readyToPlayInput.gameId);
 
@@ -138,13 +128,6 @@ export class GameService {
     }
   }
 
-  /**
-   * Creates a new action based on the input provided and updates the game state.
-   *
-   * @param {CreateActionRequestDTO} createActionInput - The input data required to create a new action.
-   * @return {Promise<GameResponseDTO>} - A promise that resolves to the updated game state after the action.
-   * @throws {InternalServerErrorException} - Throws an exception if the action creation or game update fails.
-   */
   async createAction(createActionInput: CreateActionRequestDTO): Promise<GameResponseDTO> {
     try {
       await this.actionService.createAction(createActionInput);
@@ -154,16 +137,6 @@ export class GameService {
     }
   }
 
-  /**
-   * Updates the game state after a player has performed an action.
-   *
-   * @param {Id} gameId - The unique identifier of the game being updated.
-   * @param {Id} playerId - The unique identifier of the player who has just performed an action.
-   *
-   * @return {Promise<GameResponseDTO>} - A promise that resolves to the updated game state.
-   *
-   * @throws {InternalServerErrorException} - If an error occurs while updating the game state.
-   */
   async updateGameAfterAnActin(gameId: Id, playerId: Id): Promise<GameResponseDTO> {
     try {
       let game: Game = await this.findGameById(gameId);
@@ -192,13 +165,6 @@ export class GameService {
     }
   }
 
-  /**
-   * Transition the game to the day period, update the player and game statuses accordingly.
-   *
-   * @param {Game} game - The current game instance.
-   * @param {Id} playerId - The ID of the player to update.
-   * @return {Promise<GameResponseDTO>} A promise that resolves to a data transfer object containing the updated game and player information.
-   */
   async goToDay(game: Game, playerId: Id): Promise<GameResponseDTO> {
     const player = await this.playerService.updatePlayer(playerId, { madeAction: false });
     const players = await this.playerService.setAllPlayersActionStatusAsFalse(game.id);
@@ -211,13 +177,6 @@ export class GameService {
     return { game: updatedGame, players, player };
   }
 
-  /**
-   * Transitions the game to the night phase, updating player and game state.
-   *
-   * @param {Game} game - The current state of the game.
-   * @param {Id} playerId - The identifier of the player initiating the transition.
-   * @return {Promise<GameResponseDTO>} - An object containing the updated game and player states.
-   */
   async goToNight(game: Game, playerId: Id): Promise<GameResponseDTO> {
     const nextRole = this.getNextRoleToPlay(game);
     const player = await this.playerService.updatePlayer(playerId, { madeAction: false });
@@ -231,13 +190,6 @@ export class GameService {
     return { game: updatedGame, players, player };
   }
 
-  /**
-   * Advances the game to the next role and updates the player's status.
-   *
-   * @param {Game} game - The current game instance.
-   * @param {Id} playerId - The ID of the player making the action.
-   * @return {Promise<GameResponseDTO>} - A promise resolving to the updated game and player data.
-   */
   async goToNextRole(game: Game, playerId: Id): Promise<GameResponseDTO> {
     const nextRole = this.getNextRoleToPlay(game);
     const player = await this.playerService.updatePlayer(playerId, { madeAction: true });
@@ -246,26 +198,12 @@ export class GameService {
     return { game: updatedGame, players, player };
   }
 
-  /**
-   * Records a vote from a player in a game and updates the player's action status.
-   *
-   * @param {Game} game - The current game instance.
-   * @param {Id} playerId - The unique identifier of the player who is voting.
-   * @return {Promise<GameResponseDTO>} The updated game state including players' statuses and the voting player's updated information.
-   */
   async vote(game: Game, playerId: Id): Promise<GameResponseDTO> {
     const player = await this.playerService.updatePlayer(playerId, { madeAction: true });
     const players = await this.playerService.getPlayersByGameId(game.id);
     return { game, players, player };
   }
 
-  /**
-   * Finds a game by its ID.
-   *
-   * @param {Id} id - The ID of the game.
-   * @returns {Promise<Game>} A promise that resolves with the found game.
-   * @throws {InternalServerErrorException} If an error occurs while retrieving the game.
-   */
   async findGameById(id: Id): Promise<Game> {
     try {
       return await this.prisma.game.findFirst({
@@ -276,14 +214,6 @@ export class GameService {
     }
   }
 
-  /**
-   * Updates the specified game with the provided parameters.
-   *
-   * @param {Id} id - The unique identifier of the game to be updated.
-   * @param {Partial<Game>} params - The game parameters to be updated.
-   * @return {Promise<Game>} - The updated game object.
-   * @throws {InternalServerErrorException} - If an error occurs during the update process.
-   */
   async updateGame(id: Id, params: Partial<Game>): Promise<Game> {
     try {
       return await this.prisma.game.update({
@@ -299,13 +229,6 @@ export class GameService {
     }
   }
 
-  /**
-   * Returns the available player roles for the current game.
-   *
-   * @param {PlayerRoles[]} usedRoles - The roles currently being used in the game.
-   * @param {PlayerRoles[]} rolesByNumberOfPlayers - The roles available for the current number of players.
-   * @return {PlayerRoles[]} - The available player roles for the current game.
-   */
   getAvailableForCurrentGameRoles(usedRoles: PlayerRoles[], rolesByNumberOfPlayers: PlayerRoles[]): PlayerRoles[] {
     let result: PlayerRoles[] = [];
     let actualUsedRoles: PlayerRoles[] = usedRoles;
@@ -322,12 +245,6 @@ export class GameService {
     return result;
   }
 
-  /**
-   * Return the next role to play in the game.
-   *
-   * @param {Game} game - The current game object.
-   * @return {PlayerRoles | undefined} - The next role to play, or undefined if not found.
-   */
   getNextRoleToPlay(game: Game): PlayerRoles | undefined {
     const rolesByNumberOfPlayers: PlayerRoles[] = ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers];
     let preparedOrderOfPlay: PlayerRoles[] = ORDER_OF_PLAY;

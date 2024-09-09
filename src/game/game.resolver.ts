@@ -1,4 +1,4 @@
-import { Args, Context, Mutation, Resolver, Subscription } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
 import { GameService } from './game.service';
 import { ClassSerializerInterceptor, InternalServerErrorException, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
@@ -12,6 +12,7 @@ import { Id } from '../common.types';
 import { AddNewPlayerRequestDTO } from './dto/add-new-player-request.dto';
 import { ReadyToPlayRequestDTO } from './dto/ready-to-play-request.dto';
 import { CreateActionRequestDTO } from './dto/create-action-request.dto';
+import { GetGameDataRequestDTO } from './dto/get-game-data-request.dto';
 
 const pubSub = new PubSub();
 
@@ -32,6 +33,16 @@ export class GameResolver {
   ): Promise<GameResponseDTO> {
     const user = context.req['user'] as User;
     return this.gameService.createGame(createGameInput, user);
+  }
+
+  @UseGuards(AuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Query(() => GameResponseDTO)
+  async getGameData(
+    @Args('getGameDataInput') getGameDataInput: GetGameDataRequestDTO,
+    @Context() context: { req: Request },
+  ): Promise<GameResponseDTO> {
+    return this.gameService.getGameData(getGameDataInput);
   }
 
   @UseGuards(AuthGuard)

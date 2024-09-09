@@ -49,6 +49,11 @@ type GameResponseDTO {
   players: [PlayerResponseDTO!]!
 }
 
+input GetGameDataRequestDTO {
+  gameId: Float!
+  playerId: Float!
+}
+
 input InvitePlayersRequestDTO {
   gameId: Float!
   gameName: String!
@@ -91,6 +96,7 @@ type PlayerResponseDTO {
 }
 
 type Query {
+  getGameData(getGameDataInput: GetGameDataRequestDTO!): GameResponseDTO!
   query: String!
   searchUsers(searchUsersInput: SearchUsersRequestDTO!): [User!]!
 }
