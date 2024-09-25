@@ -126,7 +126,7 @@ export class GameService {
       ) {
         game = await this.updateGame(game.id, {
           currentPeriod: GamePeriods.NIGHT,
-          currentRole: this.getNextRoleToPlay(game),
+          currentRole: this.getNextRoleToPlay(game, players),
           step: game.step + 1,
         });
       }
@@ -195,9 +195,9 @@ export class GameService {
   }
 
   async goToNight(game: Game, playerId: Id): Promise<GameResponseDTO> {
-    const nextRole = this.getNextRoleToPlay(game);
     const player = await this.playerService.updatePlayer(playerId, { madeAction: false });
     const players = await this.playerService.setAllPlayersActionStatusAsFalse(game.id);
+    const nextRole = this.getNextRoleToPlay(game, players);
     const updatedGame = await this.updateGame(game.id, {
       currentPeriod: GamePeriods.NIGHT,
       step: game.step + 1,
@@ -208,9 +208,9 @@ export class GameService {
   }
 
   async goToNextRole(game: Game, playerId: Id): Promise<GameResponseDTO> {
-    const nextRole = this.getNextRoleToPlay(game);
     const player = await this.playerService.updatePlayer(playerId, { madeAction: true });
     const players = await this.playerService.getPlayersByGameId(game.id);
+    const nextRole = this.getNextRoleToPlay(game, players);
     const updatedGame = await this.updateGame(game.id, { currentRole: nextRole });
     return { game: updatedGame, players, player };
   }
@@ -291,15 +291,28 @@ export class GameService {
     return result;
   }
 
-  getNextRoleToPlay(game: Game): PlayerRoles | undefined {
-    const rolesByNumberOfPlayers: PlayerRoles[] = ROLES_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers];
-    let preparedOrderOfPlay: PlayerRoles[] = ORDER_OF_PLAY;
-
+  getNextRoleToPlay(game: Game, players: PlayerResponseDTO[]): PlayerRoles | undefined {
     if (game.currentRole) {
       const currentRoleIndex = ORDER_OF_PLAY.findIndex(role => role === game.currentRole);
-      preparedOrderOfPlay = ORDER_OF_PLAY.slice(currentRoleIndex + 1);
+      return this.getNextRole(players, game.numberOfPlayers, currentRoleIndex);
+    }
+  }
+
+  getNextRole(players: PlayerResponseDTO[], numberOfPlayers: number, roleIndex: number) {
+    let preparedOrderOfPlay: PlayerRoles[] = ORDER_OF_PLAY.slice(roleIndex + 1);
+    const targetRole = preparedOrderOfPlay.find(role => ROLES_BY_NUMBER_OF_PLAYERS[numberOfPlayers].includes(role));
+
+    if (!targetRole) return undefined;
+
+    if (
+      players.every(player =>
+        player.role === targetRole &&
+        player.status === PlayerStatuses.KILLED,
+      )
+    ) {
+      return this.getNextRole(players, numberOfPlayers, roleIndex + 1);
     }
 
-    return preparedOrderOfPlay.find(role => rolesByNumberOfPlayers.includes(role));
+    return targetRole;
   }
 }
