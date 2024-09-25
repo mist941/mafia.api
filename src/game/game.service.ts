@@ -153,21 +153,24 @@ export class GameService {
       const actions: Action[] = await this.actionService.getActionsByGameIdAndStep(game);
 
       const isReadyForNight = players
-        .filter(player => player.id !== playerId)
+        .filter(player =>
+          player.id !== playerId &&
+          player.status === PlayerStatuses.ACTIVE,
+        )
         .every(player => player.madeAction);
 
       const isReadyForDay = LAST_ROLE_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers] === game.currentRole;
 
       if (game.currentPeriod === GamePeriods.DAY && isReadyForNight) {
         await this.killPlayerByVote(actions);
-        if (await this.checkIfGameIsFinished(players)) {
+        if (await this.checkIfGameIsFinished(gameId)) {
           return this.finishGame(gameId, playerId);
         }
         return this.goToNight(game, playerId);
       }
       if (game.currentPeriod === GamePeriods.NIGHT && isReadyForDay) {
         await this.calculateNightActions(actions, players);
-        if (await this.checkIfGameIsFinished(players)) {
+        if (await this.checkIfGameIsFinished(gameId)) {
           return this.finishGame(gameId, playerId);
         }
         return this.goToDay(game, playerId);
@@ -228,10 +231,11 @@ export class GameService {
     return { game: updatedGame, players, player };
   }
 
-  async checkIfGameIsFinished(players: PlayerResponseDTO[]): Promise<boolean> {
-    const mafiaPlayers = players.filter(player => player.role === PlayerRoles.MAFIA);
-    const peacefulResidentPlayers = players.filter(player => PEACEFUL_ROLES.includes(player.role as PlayerRoles));
-
+  async checkIfGameIsFinished(gameId: Id): Promise<boolean> {
+    const players = await this.playerService.getPlayersByGameId(gameId);
+    const activePlayers = players.filter(player => player.status === PlayerStatuses.ACTIVE);
+    const mafiaPlayers = activePlayers.filter(player => player.role === PlayerRoles.MAFIA);
+    const peacefulResidentPlayers = activePlayers.filter(player => PEACEFUL_ROLES.includes(player.role as PlayerRoles));
     if (!mafiaPlayers.length) return true;
     return mafiaPlayers.length >= peacefulResidentPlayers.length;
   }
@@ -292,22 +296,18 @@ export class GameService {
   }
 
   getNextRoleToPlay(game: Game, players: PlayerResponseDTO[]): PlayerRoles | undefined {
-    if (game.currentRole) {
-      const currentRoleIndex = ORDER_OF_PLAY.findIndex(role => role === game.currentRole);
-      return this.getNextRole(players, game.numberOfPlayers, currentRoleIndex);
-    }
+    const currentRoleIndex = ORDER_OF_PLAY.findIndex(role => role === game.currentRole);
+    return this.getNextRole(players, game.numberOfPlayers, currentRoleIndex);
   }
 
-  getNextRole(players: PlayerResponseDTO[], numberOfPlayers: number, roleIndex: number) {
+  getNextRole(players: PlayerResponseDTO[], numberOfPlayers: number, roleIndex: number): PlayerRoles {
     let preparedOrderOfPlay: PlayerRoles[] = ORDER_OF_PLAY.slice(roleIndex + 1);
     const targetRole = preparedOrderOfPlay.find(role => ROLES_BY_NUMBER_OF_PLAYERS[numberOfPlayers].includes(role));
 
-    if (!targetRole) return undefined;
-
     if (
-      players.every(player =>
+      !players.some(player =>
         player.role === targetRole &&
-        player.status === PlayerStatuses.KILLED,
+        player.status === PlayerStatuses.ACTIVE,
       )
     ) {
       return this.getNextRole(players, numberOfPlayers, roleIndex + 1);
