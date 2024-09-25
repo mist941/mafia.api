@@ -48,6 +48,28 @@ export class PlayerService {
     }
   }
 
+  async updatePlayerByActions(actions: Action[], player: PlayerResponseDTO): Promise<void> {
+    try {
+      const newPlayer: Partial<Player> = {};
+      const isPlayerKilled = actions.some(action =>
+        action.actionType === ActionTypes.KILL &&
+        action.targetPlayerId === player.id,
+      );
+      const isPlayerHealed = actions.some(action =>
+        action.actionType === ActionTypes.HILL &&
+        action.targetPlayerId === player.id,
+      );
+
+      if (isPlayerKilled && !isPlayerHealed) {
+        newPlayer.status = PlayerStatuses.KILLED;
+      }
+
+      await this.updatePlayer(player.id, newPlayer);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
   async updatePlayer(id: Id, params: Partial<Player>): Promise<PlayerResponseDTO> {
     try {
       const player: Player = await this.prisma.player.update({

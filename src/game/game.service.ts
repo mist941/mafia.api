@@ -145,6 +145,8 @@ export class GameService {
     try {
       let game: Game = await this.findGameById(gameId);
       let players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(gameId);
+      const actions: Action[] = await this.actionService.getActionsByGameIdAndStep(game);
+
       const isReadyForNight = players
         .filter(player => player.id !== playerId)
         .every(player => player.madeAction);
@@ -152,11 +154,11 @@ export class GameService {
       const isReadyForDay = LAST_ROLE_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers] === game.currentRole;
 
       if (game.currentPeriod === GamePeriods.DAY && isReadyForNight) {
-        await this.calculatePeriodResults(game);
+        await this.killPlayerByVote(actions);
         return this.goToNight(game, playerId);
       }
       if (game.currentPeriod === GamePeriods.NIGHT && isReadyForDay) {
-        await this.calculatePeriodResults(game);
+        await this.calculateNightActions(actions, players);
         return this.goToDay(game, playerId);
       }
       if (game.currentPeriod === GamePeriods.DAY) {
@@ -208,14 +210,10 @@ export class GameService {
     return { game, players, player };
   }
 
-  async calculatePeriodResults(game: Game): Promise<void> {
-    const actions: Action[] = await this.actionService.getActionsByGameIdAndStep(game);
-
-    if (game.currentPeriod === GamePeriods.DAY) {
-      await this.killPlayerByVote(actions);
-    }
-    if (game.currentPeriod === GamePeriods.NIGHT) {
-
+  async calculateNightActions(actions: Action[], players: PlayerResponseDTO[]) {
+    for (let i = 0; i < players.length; i++) {
+      const player = players[i];
+      await this.playerService.updatePlayerByActions(actions, player);
     }
   }
 
