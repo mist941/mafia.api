@@ -10,7 +10,12 @@ import { PlayerResponseDTO } from '../player/dto/player-response.dto';
 import { AddNewPlayerRequestDTO } from './dto/add-new-player-request.dto';
 import { Id } from '../common.types';
 import { ReadyToPlayRequestDTO } from './dto/ready-to-play-request.dto';
-import { LAST_ROLE_BY_NUMBER_OF_PLAYERS, ORDER_OF_PLAY, ROLES_BY_NUMBER_OF_PLAYERS } from './game.constants';
+import {
+  LAST_ROLE_BY_NUMBER_OF_PLAYERS,
+  ORDER_OF_PLAY,
+  PEACEFUL_ROLES,
+  ROLES_BY_NUMBER_OF_PLAYERS,
+} from './game.constants';
 import { CreateActionRequestDTO } from './dto/create-action-request.dto';
 import { ActionService } from '../action/action.service';
 import { GetGameDataRequestDTO } from './dto/get-game-data-request.dto';
@@ -155,10 +160,16 @@ export class GameService {
 
       if (game.currentPeriod === GamePeriods.DAY && isReadyForNight) {
         await this.killPlayerByVote(actions);
+        if (await this.checkIfGameIsFinished(players)) {
+          return this.finishGame(gameId, playerId);
+        }
         return this.goToNight(game, playerId);
       }
       if (game.currentPeriod === GamePeriods.NIGHT && isReadyForDay) {
         await this.calculateNightActions(actions, players);
+        if (await this.checkIfGameIsFinished(players)) {
+          return this.finishGame(gameId, playerId);
+        }
         return this.goToDay(game, playerId);
       }
       if (game.currentPeriod === GamePeriods.DAY) {
@@ -208,6 +219,21 @@ export class GameService {
     const player = await this.playerService.updatePlayer(playerId, { madeAction: true });
     const players = await this.playerService.getPlayersByGameId(game.id);
     return { game, players, player };
+  }
+
+  async finishGame(gameId: Id, playerId: Id): Promise<GameResponseDTO> {
+    const player = await this.playerService.getPlayerById(playerId);
+    const players = await this.playerService.getPlayersByGameId(gameId);
+    const updatedGame = await this.updateGame(gameId, { currentPeriod: GamePeriods.END });
+    return { game: updatedGame, players, player };
+  }
+
+  async checkIfGameIsFinished(players: PlayerResponseDTO[]): Promise<boolean> {
+    const mafiaPlayers = players.filter(player => player.role === PlayerRoles.MAFIA);
+    const peacefulResidentPlayers = players.filter(player => PEACEFUL_ROLES.includes(player.role as PlayerRoles));
+
+    if (!mafiaPlayers.length) return true;
+    return mafiaPlayers.length >= peacefulResidentPlayers.length;
   }
 
   async calculateNightActions(actions: Action[], players: PlayerResponseDTO[]) {

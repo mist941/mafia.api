@@ -213,6 +213,15 @@ export const ROLES_BY_NUMBER_OF_PLAYERS: { [key: number]: PlayerRoles[] } = {
   ],
 };
 
+export const PEACEFUL_ROLES: PlayerRoles[] = [
+  PlayerRoles.PEACEFUL_RESIDENT,
+  PlayerRoles.DOCTOR,
+  PlayerRoles.COMMISSAR,
+  PlayerRoles.BEAUTY,
+  PlayerRoles.GUARDIAN,
+  PlayerRoles.SECRET_AGENT,
+];
+
 export const ORDER_OF_PLAY: PlayerRoles[] = [
   PlayerRoles.BEAUTY,
   PlayerRoles.MAFIA,
