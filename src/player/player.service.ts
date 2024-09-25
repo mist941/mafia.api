@@ -4,6 +4,8 @@ import { Id } from '../common.types';
 import { PlayerRoles, PlayerStatuses } from './player.types';
 import { PlayerResponseDTO } from './dto/player-response.dto';
 import { Player } from './player.entity';
+import { Action } from '@prisma/client';
+import { ActionTypes } from '../action/action.types';
 
 @Injectable()
 export class PlayerService {
@@ -52,6 +54,7 @@ export class PlayerService {
         where: { id },
         data: {
           madeAction: params.madeAction,
+          status: params.status,
         },
         select: this.DEFAULT_PLAYER_DB_SELECTION,
       });
@@ -115,6 +118,33 @@ export class PlayerService {
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
+  }
+
+  findPlayerIdToKillByVote(actions: Action[]) {
+    const candidatesForKill: Map<Id, number> = new Map();
+
+    actions.forEach(action => {
+      if (action.actionType === ActionTypes.VOTE) {
+        const candidateId = action.targetPlayerId;
+        const currentVotes = candidatesForKill.get(candidateId) || 0;
+        candidatesForKill.set(candidateId, currentVotes + 1);
+      }
+    });
+
+    let maxVotes = 0;
+    candidatesForKill.forEach(votes => {
+      if (votes > maxVotes) {
+        maxVotes = votes;
+      }
+    });
+
+    const candidatesWithMaxVotes = Array.from(candidatesForKill.entries())
+      .filter(([_, votes]) => votes === maxVotes)
+      .map(([id]) => id);
+
+    if (candidatesWithMaxVotes.length > 1) return;
+
+    return candidatesWithMaxVotes[0];
   }
 
   serializePlayer(player): PlayerResponseDTO {

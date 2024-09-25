@@ -4,9 +4,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { GamePeriods } from './game.types';
 import { User } from '../users/user.entity';
 import { GameResponseDTO } from './dto/geme-response.dto';
-import { PlayerRoles } from '../player/player.types';
+import { PlayerRoles, PlayerStatuses } from '../player/player.types';
 import { PlayerService } from '../player/player.service';
-import { Game } from './game.entity';
 import { PlayerResponseDTO } from '../player/dto/player-response.dto';
 import { AddNewPlayerRequestDTO } from './dto/add-new-player-request.dto';
 import { Id } from '../common.types';
@@ -15,6 +14,7 @@ import { LAST_ROLE_BY_NUMBER_OF_PLAYERS, ORDER_OF_PLAY, ROLES_BY_NUMBER_OF_PLAYE
 import { CreateActionRequestDTO } from './dto/create-action-request.dto';
 import { ActionService } from '../action/action.service';
 import { GetGameDataRequestDTO } from './dto/get-game-data-request.dto';
+import { Action, Game } from '@prisma/client';
 
 /**
  * Service class for managing game-related operations.
@@ -40,7 +40,7 @@ export class GameService {
     const players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(getGameDataInput.gameId);
     const player: PlayerResponseDTO = await this.playerService.getPlayerById(getGameDataInput.playerId);
 
-    return {game, players, player};
+    return { game, players, player };
   }
 
   async createGame(createGameInput: CreateGameRequestDTO, user: User): Promise<GameResponseDTO> {
@@ -114,7 +114,11 @@ export class GameService {
       const player: PlayerResponseDTO = await this.playerService.readyToPlay(readyToPlayInput.playerId);
       const players: PlayerResponseDTO[] = await this.playerService.getPlayersByGameId(readyToPlayInput.gameId);
 
-      if (players.every(player => player.ready)) {
+      if (
+        players
+          .filter(player => player.status === PlayerStatuses.ACTIVE)
+          .every(player => player.ready)
+      ) {
         game = await this.updateGame(game.id, {
           currentPeriod: GamePeriods.NIGHT,
           currentRole: this.getNextRoleToPlay(game),
@@ -145,13 +149,14 @@ export class GameService {
         .filter(player => player.id !== playerId)
         .every(player => player.madeAction);
 
+      const isReadyForDay = LAST_ROLE_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers] === game.currentRole;
+
       if (game.currentPeriod === GamePeriods.DAY && isReadyForNight) {
+        await this.calculatePeriodResults(game);
         return this.goToNight(game, playerId);
       }
-      if (
-        game.currentPeriod === GamePeriods.NIGHT &&
-        LAST_ROLE_BY_NUMBER_OF_PLAYERS[game.numberOfPlayers] === game.currentRole
-      ) {
+      if (game.currentPeriod === GamePeriods.NIGHT && isReadyForDay) {
+        await this.calculatePeriodResults(game);
         return this.goToDay(game, playerId);
       }
       if (game.currentPeriod === GamePeriods.DAY) {
@@ -159,7 +164,6 @@ export class GameService {
       }
 
       return this.goToNextRole(game, playerId);
-
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
@@ -202,6 +206,24 @@ export class GameService {
     const player = await this.playerService.updatePlayer(playerId, { madeAction: true });
     const players = await this.playerService.getPlayersByGameId(game.id);
     return { game, players, player };
+  }
+
+  async calculatePeriodResults(game: Game): Promise<void> {
+    const actions: Action[] = await this.actionService.getActionsByGameIdAndStep(game);
+
+    if (game.currentPeriod === GamePeriods.DAY) {
+      await this.killPlayerByVote(actions);
+    }
+    if (game.currentPeriod === GamePeriods.NIGHT) {
+
+    }
+  }
+
+  async killPlayerByVote(actions: Action[]): Promise<void> {
+    const playerIdToKill = this.playerService.findPlayerIdToKillByVote(actions);
+    if (playerIdToKill) {
+      await this.playerService.updatePlayer(playerIdToKill, { status: PlayerStatuses.KILLED });
+    }
   }
 
   async findGameById(id: Id): Promise<Game> {
