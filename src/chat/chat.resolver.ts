@@ -6,7 +6,6 @@ import { PubSub } from 'graphql-subscriptions';
 import { CreateMessageRequestDTO } from './dto/create-message-request.dto';
 import { ChatService } from './chat.service';
 import { MessageResponseDTO } from './dto/message-response.dto';
-import { InvitePlayersResponseDTO } from '../game/dto/invite-players-response.dto';
 import { Id } from '../common.types';
 
 
@@ -42,7 +41,7 @@ export class ChatResolver {
   @Subscription(() => MessageResponseDTO, {
     nullable: true,
     resolve: (value) => value,
-    filter: (payload, variables) => {
+    filter: () => {
       return true;
     },
   })
