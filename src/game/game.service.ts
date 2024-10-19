@@ -301,6 +301,8 @@ export class GameService {
   }
 
   getNextRole(players: PlayerResponseDTO[], numberOfPlayers: number, roleIndex: number): PlayerRoles {
+    //check to prevent maximum call stack size, recommended to fix in the future
+    if (roleIndex > 8) return;
     let preparedOrderOfPlay: PlayerRoles[] = ORDER_OF_PLAY.slice(roleIndex + 1);
     const targetRole = preparedOrderOfPlay.find(role => ROLES_BY_NUMBER_OF_PLAYERS[numberOfPlayers].includes(role));
 
